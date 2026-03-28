@@ -42,7 +42,7 @@
     "skipLibCheck": true,
     "paths": {
       "@/*": ["./src/*"],
-      "@util/*": ["./src/util/*"],
+      "@service/*": ["./src/service/*"],
       "@middleware/*": ["./src/middleware/*"],
     }
   }

@@ -1,4 +1,4 @@
-import logger from "@/util/logger.js";
+import logger from "@service/logger.js";
 import type { NextFunction, Request, Response } from "express";
 
 function loggerMiddleware(req: Request, res: Response, next: NextFunction) {
