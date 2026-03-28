@@ -9,7 +9,9 @@ const app = express();
 
 app.use(loggerMiddleware);
 
+// > register routes
 new TestController().registerRoutes(app);
+// < register routes
 
 app.use(errorMiddleware);
 
