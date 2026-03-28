@@ -3,12 +3,13 @@ import { AVAILABLE_STATUSES } from "@/enum/status.js";
 import sequelize from "@/service/sequelize.js";
 import { DataTypes, Model } from "sequelize";
 import bcrypt from "bcrypt";
+import type Status from "./status.js";
 
 class User extends Model {
   declare id: number;
   declare email: string;
   declare name: string;
-  declare status: string;
+  declare status: Status;
   declare role: string;
   declare password: string;
 }
