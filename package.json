@@ -8,8 +8,11 @@
   "main": "index.js",
   "scripts": {
     "dev": "npx tsx --watch src/index.ts",
-    "db:migrate": "npx sequelize-cli --options-path .sequelizerc.cjs db:migrate",
-    "db:rollback": "npx sequelize-cli --options-path .sequelizerc.cjs db:migrate:undo"
+    "migrate:up": "npx sequelize-cli --options-path .sequelizerc.cjs db:migrate",
+    "migrate:down": "npx sequelize-cli --options-path .sequelizerc.cjs db:migrate:undo",
+    "seed:run": "npx sequelize-cli --options-path .sequelizerc.cjs db:seed:all",
+    "seed:rollback": "npx sequelize-cli --options-path .sequelizerc.cjs db:seed:undo",
+    "seed:generate": "npx sequelize-cli --options-path .sequelizerc.cjs seed:generate"
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
