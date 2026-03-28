@@ -15,6 +15,7 @@
     "seed:generate": "npx sequelize-cli --options-path .sequelizerc.cjs seed:generate"
   },
   "devDependencies": {
+    "@types/bcrypt": "^6.0.0",
     "@types/express": "^5.0.6",
     "@types/mime-types": "^3.0.1",
     "@types/multer": "^2.1.0",
@@ -25,6 +26,7 @@
     "typescript": "^6.0.2"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
     "mime-types": "^3.0.2",
