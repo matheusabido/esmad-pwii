@@ -5,6 +5,7 @@ import Building from "./building.js";
 import { AVAILABLE_PRIORITIES, type Priority } from "@/enum/priority.js";
 import Status from "./status.js";
 import Category from "./category.js";
+import IncidentPicture from "./incident_picture.js";
 
 class Incident extends Model {
   declare id: number;
@@ -77,5 +78,11 @@ Incident.init(
   },
   { sequelize, tableName: "incidents", modelName: "incident" },
 );
+
+Incident.belongsTo(User, { foreignKey: "userId", as: "user" });
+Incident.belongsTo(Building, { foreignKey: "buildingId", as: "building" });
+Incident.belongsTo(Status, { foreignKey: "statusId", as: "status" });
+Incident.belongsTo(Category, { foreignKey: "categoryId", as: "category" });
+Incident.hasMany(IncidentPicture, { foreignKey: "incidentId", as: "pictures" });
 
 export default Incident;

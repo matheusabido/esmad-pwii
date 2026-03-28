@@ -4,6 +4,8 @@ import sequelize from "@/service/sequelize.js";
 import { DataTypes, Model } from "sequelize";
 import bcrypt from "bcrypt";
 import type Status from "./status.js";
+import Incident from "./incident.js";
+import Comment from "./comment.js";
 
 class User extends Model {
   declare id: number;
@@ -54,5 +56,8 @@ User.init(
   },
   { sequelize, tableName: "users", modelName: "user" },
 );
+
+User.hasMany(Incident, { foreignKey: "userId", as: "incidents" });
+User.hasMany(Comment, { foreignKey: "userId", as: "comments" });
 
 export default User;

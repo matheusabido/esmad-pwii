@@ -42,4 +42,9 @@ IncidentPicture.init(
   { sequelize, tableName: "incident_pictures", modelName: "incident_picture" },
 );
 
+IncidentPicture.belongsTo(Incident, {
+  foreignKey: "incidentId",
+  as: "incident",
+});
+
 export default IncidentPicture;
