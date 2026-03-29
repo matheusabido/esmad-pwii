@@ -1,5 +1,6 @@
 import logger from "@/service/logger.js";
 import type { NextFunction, Request, Response } from "express";
+import jwt from "jsonwebtoken";
 import { MulterError } from "multer";
 import { ZodError } from "zod";
 
@@ -34,6 +35,8 @@ async function errorMiddleware(
       }
     } else if (err instanceof SyntaxError) {
       return res.status(400).json({ error: "Invalid JSON" });
+    } else if (err instanceof jwt.JsonWebTokenError) {
+      return res.status(403).json({ error: "Invalid credentials" });
     } else if (err instanceof ZodError) {
       const details = err.issues.reduce(
         (a, b) => ({ ...a, [b.path.join(".")]: b.message }),
