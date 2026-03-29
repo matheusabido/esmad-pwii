@@ -1,6 +1,7 @@
 import logger from "@/service/logger.js";
 import type { NextFunction, Request, Response } from "express";
 import { MulterError } from "multer";
+import { ZodError } from "zod";
 
 async function errorMiddleware(
   err: Error,
@@ -31,6 +32,17 @@ async function errorMiddleware(
         default:
           return res.status(400).json({ error: "Upload error" });
       }
+    } else if (err instanceof SyntaxError) {
+      return res.status(400).json({ error: "Invalid JSON" });
+    } else if (err instanceof ZodError) {
+      const details = err.issues.reduce(
+        (a, b) => ({ ...a, [b.path.join(".")]: b.message }),
+        {},
+      );
+
+      return res.status(400).json({ error: "Validation error", details });
+    } else if (process.env.NODE_ENV === "development") {
+      console.log(err);
     }
   }
   next(err);

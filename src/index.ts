@@ -2,16 +2,18 @@ import express from "express";
 import "dotenv/config";
 import logger from "@service/logger.js";
 import loggerMiddleware from "@middleware/logger.js";
-import TestController from "./controllers/test_controller.js";
 import errorMiddleware from "./middleware/error.js";
+import { registerRoutes } from "./controllers/controller.js";
+import { associateModels } from "./models/index.js";
+
+await associateModels();
 
 const app = express();
 
+app.use(express.json());
 app.use(loggerMiddleware);
 
-// > register routes
-new TestController().registerRoutes(app);
-// < register routes
+registerRoutes(app);
 
 app.use(errorMiddleware);
 

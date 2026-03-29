@@ -24,6 +24,12 @@ Baixe as dependências:
 npm install
 ```
 
+Rode as migrations:
+
+```
+npm run migrate:up
+```
+
 Rode o projeto:
 
 ```

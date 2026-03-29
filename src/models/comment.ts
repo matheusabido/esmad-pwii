@@ -49,7 +49,4 @@ Comment.init(
   { sequelize, tableName: "comments", modelName: "comment" },
 );
 
-Comment.belongsTo(User, { foreignKey: "userId", as: "user" });
-Comment.belongsTo(Incident, { foreignKey: "incidentId", as: "incident" });
-
 export default Comment;
