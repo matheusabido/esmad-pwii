@@ -52,6 +52,7 @@ O enunciado do trabalho pede para usarmos ExpressJS e Sequelize (MySQL) ou Mongo
 
 Optei por MySQL por preferir uma abordagem relacional para a maioria dos problemas, especialmente nesse caso onde quero fazer vários joins, ter que fazer com o pipeline no mongo é menos prático.
 
+- ExpressJS
 - MySQL
 - Sequelize
 
@@ -62,6 +63,7 @@ Além das tecnologias que nos foram apontadas, tomei a liberdade de adicionar ma
 - Multer (parse dos multipart/form-data)
 - Sharp (compactar imagens)
 - Zod (validação de body)
+- jsonwebtoken (autenticação)
 
 Também decidi usar typescript, já que acredito que é muito melhor para manutenção do código.
 
@@ -86,6 +88,10 @@ Já usei em outros projetos e é bem simples de usar. Funciona perfeitamente par
 #### Zod
 
 Estava em dúvida entre Zod e VineJS. Trabalhei com AdonisJS por algum tempo e vi que vine é mais rápido, mas na época sentia falta de algumas funções e o zod parece bem interessante. Vai ser legal testar uma lib de validação nova. Além disso, velocidade não vai fazer diferença na minha API.
+
+#### jsonwebtoken
+
+Implementação de [JWT](https://www.jwt.io) para node. É excelente para autenticar sem precisar de tabela de tokens no banco, apesar de ser bom uma tabela de tokens revogados num projeto real.
 
 ### Documentação
 
