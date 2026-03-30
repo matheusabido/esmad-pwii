@@ -1,9 +1,8 @@
 import { AVAILABLE_ROLES } from "@/enum/role.js";
-import { AVAILABLE_STATUSES } from "@/enum/status.js";
+import { AVAILABLE_STATUSES, type Status } from "@/enum/status.js";
 import sequelize from "@/service/sequelize.js";
 import { DataTypes, Model } from "sequelize";
 import bcrypt from "bcrypt";
-import type Status from "./status.js";
 
 class User extends Model {
   declare id: number;
