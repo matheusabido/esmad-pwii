@@ -75,7 +75,7 @@ export default class UserController implements Controller {
         id: user.id,
       },
       process.env.JWT_SECRET!,
-      { expiresIn: "1min", algorithm: "HS256", issuer: "pwii" },
+      { expiresIn: "1h", algorithm: "HS256", issuer: "pwii" },
     );
 
     return res.status(200).json({

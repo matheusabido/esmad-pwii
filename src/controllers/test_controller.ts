@@ -22,7 +22,7 @@ export default class TestController implements Controller {
   }
 
   async helloWorld(req: Request, res: Response) {
-    return res.send("Hello, World!");
+    return res.json({ message: `Hello, ${req.user?.name}!` });
   }
 
   registerRoutes(app: Express): void {
