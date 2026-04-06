@@ -15,6 +15,13 @@ const listValidator = z.object({
     .default(1),
 });
 
+const findValidator = z.object({
+  id: z.coerce
+    .number("ID deve ser um número")
+    .int("ID deve ser um inteiro")
+    .positive("ID deve ser um número positivo"),
+});
+
 export default class StatusController implements Controller {
   async list(req: Request, res: Response) {
     if (req.user!.role !== "admin") {
@@ -42,7 +49,24 @@ export default class StatusController implements Controller {
     });
   }
 
+  async find(req: Request, res: Response) {
+    const { id } = findValidator.parse(req.params);
+
+    const status = await Status.findByPk(id);
+    if (!status) {
+      return res.status(404).json({ error: "Status não encontrado" });
+    }
+
+    return res.status(200).json({
+      id: status.id,
+      name: status.name,
+      description: status.description,
+      color: status.color,
+    });
+  }
+
   registerRoutes(app: Express): void {
     app.get("/statuses", authMiddlware, this.list);
+    app.get("/status/:id", authMiddlware, this.find);
   }
 }
