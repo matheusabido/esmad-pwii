@@ -143,10 +143,27 @@ export default class StatusController implements Controller {
     });
   }
 
+  async delete(req: Request, res: Response) {
+    if (req.user!.role !== "admin") {
+      return res.status(403).json({ error: "Acesso não autorizado" });
+    }
+
+    const { id } = findValidator.parse(req.params);
+
+    const status = await Status.findByPk(id);
+    if (!status) {
+      return res.status(404).json({ error: "Status não encontrado" });
+    }
+
+    await status.destroy();
+    return res.status(204).send();
+  }
+
   registerRoutes(app: Express): void {
     app.get("/statuses", authMiddlware, this.list);
     app.get("/status/:id", authMiddlware, this.find);
     app.post("/status", authMiddlware, this.store);
     app.patch("/status/:id", authMiddlware, this.patch);
+    app.delete("/status/:id", authMiddlware, this.delete);
   }
 }
