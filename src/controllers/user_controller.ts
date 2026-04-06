@@ -71,7 +71,6 @@ export default class UserController implements Controller {
   async find(req: Request, res: Response) {
     const { id } = findValidator.parse(req.params);
 
-    console.log(req.user);
     if (req.user!.id !== id && req.user!.role !== "admin") {
       return res.status(403).json({ error: "Acesso não autorizado" });
     }
@@ -110,7 +109,7 @@ export default class UserController implements Controller {
       meta: {
         total: count,
         page,
-        lastPage: Math.ceil(count / 20),
+        lastPage: Math.max(Math.ceil(count / 20), 1),
       },
     });
   }
