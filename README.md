@@ -7,6 +7,7 @@ Projeto desenvolvido como trabalho avaliativo para a matéria de Programação W
 3. [Tecnologias](#tecnologias)
 4. [Motivações para Tecnologias](#motivações-para-tecnologias)
 5. [Documentação](#documentação)
+6. [Testar](#testar)
 
 ### Como Rodar
 
@@ -98,3 +99,9 @@ Implementação de [JWT](https://www.jwt.io) para node. É excelente para autent
 Ainda não fiz o Swagger :)
 
 Mas vai sair. É um requisito hahahah
+
+### Testar
+
+O jeito mais prático de testar o projeto é, depois de rodar, usar o [usebruno.com](https://usebruno.com) e importar a pasta **/bruno** do projeto.
+
+Feito isso, é só criar uma conta e fazer login (as credenciais são atualizadas no cliente automaticamente) e usar as rotas normalmente.
