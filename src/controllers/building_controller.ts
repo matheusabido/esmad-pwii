@@ -4,8 +4,9 @@ import z from "zod";
 import Building from "@/models/building.js";
 import { AVAILABLE_STATUSES } from "@/enum/status.js";
 import { authMiddlware } from "@/middleware/auth.js";
-import { Op, type WhereOptions } from "sequelize";
+import { Op, Sequelize, type WhereOptions } from "sequelize";
 import { paginate } from "@/utils/paginate.js";
+import { getPolygonCoordinatesByWKT } from "@/utils/wellknown.js";
 
 const storeValidator = z.object({
   name: z
@@ -44,7 +45,9 @@ const patchValidator = z.object({
       "Área deve respeitar o formato do polygon WKT",
     )
     .optional(),
-  status: z.enum(AVAILABLE_STATUSES).optional(),
+  status: z
+    .enum(AVAILABLE_STATUSES, "Status deve ser um valor válido")
+    .optional(),
 });
 
 const findValidator = z.object({
@@ -98,15 +101,22 @@ export default class BuildingController implements Controller {
 
     const { name, description, area } = storeValidator.parse(req.body);
 
-    const error = this.validatePolygonPoints(area);
-    if (error) {
-      return res.status(error.status).json({ error: error.message });
+    let coordinates: number[][];
+    try {
+      coordinates = getPolygonCoordinatesByWKT(area);
+    } catch (error) {
+      return res
+        .status(400)
+        .json({ error: "Coordenadas do polígono inválidas." });
     }
 
     const building = await Building.create({
       name,
       description,
-      area,
+      area: {
+        type: "Polygon",
+        coordinates: [coordinates],
+      },
       status: "active",
     });
 
@@ -126,19 +136,24 @@ export default class BuildingController implements Controller {
       return res.status(404).json({ error: "Edifício não encontrado." });
     }
 
+    if (name) building.name = name;
+    if (description) building.description = description;
+    if (status) building.status = status;
     if (area) {
-      const error = this.validatePolygonPoints(area);
-      if (error) {
-        return res.status(error.status).json({ error: error.message });
+      try {
+        const coordinates = getPolygonCoordinatesByWKT(area);
+        building.area = {
+          type: "Polygon",
+          coordinates: [coordinates],
+        };
+      } catch (error) {
+        return res
+          .status(400)
+          .json({ error: "Coordenadas do polígono inválidas." });
       }
     }
 
-    await building.update({
-      name: name ?? building.name,
-      description: description ?? building.description,
-      area: area ?? building.area,
-      status: status ?? building.status,
-    });
+    await building.save();
 
     return res.status(200).json(building);
   }
@@ -165,39 +180,5 @@ export default class BuildingController implements Controller {
     app.post("/building", authMiddlware, this.store.bind(this));
     app.patch("/building/:id", authMiddlware, this.patch.bind(this));
     app.delete("/building/:id", authMiddlware, this.delete);
-  }
-
-  private validatePolygonPoints(
-    wkt: string,
-  ): { message: string; status: number } | undefined {
-    const points = wkt.split("((")[1]?.split("))")[0]?.split(",");
-    if (!points || points.length < 2) {
-      return {
-        message: "Área deve conter pontos válidos.",
-        status: 400,
-      };
-    }
-
-    const [x1, y1] = points[0]!.split(" ").map((p) => Number(p.trim())) as [
-      number,
-      number,
-    ];
-    const [x2, y2] = points[points.length - 1]!.split(" ").map((p) =>
-      Number(p.trim()),
-    ) as [number, number];
-
-    if (isNaN(x1) || isNaN(y1) || isNaN(x2) || isNaN(y2)) {
-      return {
-        message: "Área deve conter coordenadas numéricas válidas.",
-        status: 400,
-      };
-    }
-
-    if (x1 !== x2 || y1 !== y2) {
-      return {
-        message: "Área deve ser um polígono fechado.",
-        status: 400,
-      };
-    }
   }
 }

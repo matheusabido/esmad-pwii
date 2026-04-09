@@ -1,14 +1,16 @@
-import { AVAILABLE_STATUSES } from "@/enum/status.js";
+import { AVAILABLE_STATUSES, type Status } from "@/enum/status.js";
 import sequelize from "@/service/sequelize.js";
 import { DataTypes, Model } from "sequelize";
-import type Status from "./status.js";
 
 class Building extends Model {
   declare id: number;
   declare name: string;
   declare description: string;
   declare status: Status;
-  declare area: string;
+  declare area: {
+    type: "Polygon";
+    coordinates: number[][][];
+  };
 }
 
 Building.init(
