@@ -7,6 +7,7 @@ import { authMiddlware } from "@/middleware/auth.js";
 import { Op, Sequelize, type WhereOptions } from "sequelize";
 import { paginate } from "@/utils/paginate.js";
 import { getPolygonCoordinatesByWKT } from "@/utils/wellknown.js";
+import logger from "@/service/logger.js";
 
 const storeValidator = z.object({
   name: z
@@ -105,6 +106,7 @@ export default class BuildingController implements Controller {
     try {
       coordinates = getPolygonCoordinatesByWKT(area);
     } catch (error) {
+      logger.error(error, "Error while parsing polygon coordinates: " + area);
       return res
         .status(400)
         .json({ error: "Coordenadas do polígono inválidas." });
@@ -147,6 +149,7 @@ export default class BuildingController implements Controller {
           coordinates: [coordinates],
         };
       } catch (error) {
+        logger.error(error, "Error while parsing polygon coordinates: " + area);
         return res
           .status(400)
           .json({ error: "Coordenadas do polígono inválidas." });
