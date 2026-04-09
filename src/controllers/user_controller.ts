@@ -8,6 +8,7 @@ import { AVAILABLE_STATUSES, type Status } from "@/enum/status.js";
 import { AVAILABLE_ROLES } from "@/enum/role.js";
 import { Op, type WhereOptions } from "sequelize";
 import { authMiddlware } from "@/middleware/auth.js";
+import { paginate } from "@/utils/paginate.js";
 
 const storeValidator = z.object({
   email: z.email("E-mail inválido").trim(),
@@ -104,14 +105,7 @@ export default class UserController implements Controller {
       attributes: ["id", "email", "name", "status", "role"],
     });
 
-    return res.status(200).json({
-      data: rows,
-      meta: {
-        total: count,
-        page,
-        lastPage: Math.max(Math.ceil(count / 20), 1),
-      },
-    });
+    return res.status(200).json(paginate({ rows, total: count, page }));
   }
 
   async store(req: Request, res: Response) {

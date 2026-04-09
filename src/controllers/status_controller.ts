@@ -4,6 +4,7 @@ import Status from "@/models/status.js";
 import z from "zod";
 import { Op, type WhereOptions } from "sequelize";
 import { authMiddlware } from "@/middleware/auth.js";
+import { paginate } from "@/utils/paginate.js";
 
 const listValidator = z.object({
   name: z.string("O nome deve ser um texto").trim().optional(),
@@ -74,14 +75,7 @@ export default class StatusController implements Controller {
       limit: 20,
     });
 
-    return res.status(200).json({
-      data: rows,
-      meta: {
-        total: count,
-        page,
-        lastPage: Math.max(Math.ceil(count / 20), 1),
-      },
-    });
+    return res.status(200).json(paginate({ rows, total: count, page }));
   }
 
   async find(req: Request, res: Response) {
@@ -92,12 +86,7 @@ export default class StatusController implements Controller {
       return res.status(404).json({ error: "Status não encontrado" });
     }
 
-    return res.status(200).json({
-      id: status.id,
-      name: status.name,
-      description: status.description,
-      color: status.color,
-    });
+    return res.status(200).json(status);
   }
 
   async store(req: Request, res: Response) {
@@ -108,12 +97,7 @@ export default class StatusController implements Controller {
     const { name, description, color } = storeValidator.parse(req.body);
     const status = await Status.create({ name, description, color });
 
-    return res.status(201).json({
-      id: status.id,
-      name: status.name,
-      description: status.description,
-      color: status.color,
-    });
+    return res.status(201).json(status);
   }
 
   async patch(req: Request, res: Response) {
@@ -129,18 +113,13 @@ export default class StatusController implements Controller {
       return res.status(404).json({ error: "Status não encontrado" });
     }
 
-    if (name) status.name = name;
-    if (description) status.description = description;
-    if (color) status.color = color;
-
-    await status.save();
-
-    return res.status(200).json({
-      id: status.id,
-      name: status.name,
-      description: status.description,
-      color: status.color,
+    await status.update({
+      name: name ?? status.name,
+      description: description ?? status.description,
+      color: color ?? status.color,
     });
+
+    return res.status(200).json(status);
   }
 
   async delete(req: Request, res: Response) {

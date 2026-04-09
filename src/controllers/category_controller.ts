@@ -4,6 +4,7 @@ import z from "zod";
 import { Op, type WhereOptions } from "sequelize";
 import Category from "@/models/category.js";
 import { authMiddlware } from "@/middleware/auth.js";
+import { paginate } from "@/utils/paginate.js";
 
 const listValidator = z.object({
   name: z.string("O nome deve ser um texto").trim().optional(),
@@ -74,17 +75,14 @@ export default class CategoryController implements Controller {
       limit: 20,
     });
 
-    return res.status(200).json({
-      data: rows,
-      meta: {
-        total: count,
-        page,
-        lastPage: Math.max(Math.ceil(count / 20), 1),
-      },
-    });
+    return res.status(200).json(paginate({ rows, total: count, page }));
   }
 
   async find(req: Request, res: Response) {
+    if (req.user?.role !== "admin") {
+      return res.status(403).json({ error: "Acesso negado" });
+    }
+
     const { id } = findValidator.parse(req.params);
 
     const category = await Category.findByPk(id);
@@ -92,12 +90,7 @@ export default class CategoryController implements Controller {
       return res.status(404).json({ error: "Categoria não encontrada" });
     }
 
-    return res.status(200).json({
-      id: category.id,
-      name: category.name,
-      description: category.description,
-      color: category.color,
-    });
+    return res.status(200).json(category);
   }
 
   async store(req: Request, res: Response) {
@@ -113,12 +106,7 @@ export default class CategoryController implements Controller {
       color,
     });
 
-    return res.status(201).json({
-      id: category.id,
-      name: category.name,
-      description: category.description,
-      color: category.color,
-    });
+    return res.status(201).json(category);
   }
 
   async patch(req: Request, res: Response) {
@@ -134,18 +122,13 @@ export default class CategoryController implements Controller {
       return res.status(404).json({ error: "Categoria não encontrada" });
     }
 
-    if (name) category.name = name;
-    if (description) category.description = description;
-    if (color) category.color = color;
-
-    await category.save();
-
-    return res.status(200).json({
-      id: category.id,
-      name: category.name,
-      description: category.description,
-      color: category.color,
+    await category.update({
+      name: name ?? category.name,
+      description: description ?? category.description,
+      color: color ?? category.color,
     });
+
+    return res.status(200).json(category);
   }
 
   async delete(req: Request, res: Response) {
