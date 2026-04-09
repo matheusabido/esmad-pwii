@@ -1,0 +1,23 @@
+info:
+  name: POST building
+  type: http
+  seq: 3
+
+http:
+  method: POST
+  url: http://localhost:3000/building
+  body:
+    type: json
+    data: |-
+      {
+        "name": "testBuilding",
+        "description": "testDescription",
+        "area": "POLYGON((10 20, 20 30, 30 40, 10 20))"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

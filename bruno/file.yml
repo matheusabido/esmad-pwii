@@ -1,0 +1,22 @@
+info:
+  name: file
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:3000/file
+  body:
+    type: multipart-form
+    data:
+      - name: test_file
+        type: file
+        value:
+          - /Users/matheusabido/Desktop/Captura de Tela 2026-03-28 às 11.27.54.png
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

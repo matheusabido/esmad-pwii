@@ -1,0 +1,22 @@
+info:
+  name: PATCH building
+  type: http
+  seq: 4
+
+http:
+  method: PATCH
+  url: http://localhost:3000/building/1
+  body:
+    type: json
+    data: |-
+      {
+        "status": "rejected",
+        "area": "POLYGON((10 30, 20 30, 30 40, 10 30))"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
