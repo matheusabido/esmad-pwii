@@ -4,7 +4,7 @@ import z from "zod";
 import Building from "@/models/building.js";
 import { AVAILABLE_STATUSES } from "@/enum/status.js";
 import { authMiddlware } from "@/middleware/auth.js";
-import { Op, Sequelize, type WhereOptions } from "sequelize";
+import { Op, type WhereOptions } from "sequelize";
 import { paginate } from "@/utils/paginate.js";
 import { getPolygonCoordinatesByWKT } from "@/utils/wellknown.js";
 import logger from "@/service/logger.js";

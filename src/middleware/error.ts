@@ -1,7 +1,8 @@
 import logger from "@/service/logger.js";
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import multer, { MulterError } from "multer";
+import { MulterError } from "multer";
+import { rm } from "node:fs/promises";
 import { ZodError } from "zod";
 
 async function errorMiddleware(
@@ -11,6 +12,13 @@ async function errorMiddleware(
   next: NextFunction,
 ) {
   if (err) {
+    if (Array.isArray(req.files)) {
+      await Promise.all(req.files.map((currentFile) => rm(currentFile.path)));
+    } else {
+      const files = Object.values(req.files ?? {}).flat();
+      await Promise.all(files.map((currentFile) => rm(currentFile.path)));
+    }
+
     if (err instanceof MulterError) {
       logger.error(`Multer error: ${err.message} (code: ${err.code})`);
       switch (err.code) {
@@ -55,10 +63,12 @@ async function errorMiddleware(
     } else if (process.env.NODE_ENV === "development") {
       console.log(err);
     }
+
+    logger.error(err, "Unhandled error");
+    return res.status(500).json({ error: "Erro interno do servidor" });
   }
 
-  logger.error(err, "Unhandled error");
-  return res.status(500).json({ error: "Erro interno do servidor" });
+  next(err);
 }
 
 export default errorMiddleware;

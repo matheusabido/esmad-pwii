@@ -1,10 +1,10 @@
 import type { Express, Request, Response } from "express";
 import type Controller from "./controller.js";
-import z, { email } from "zod";
+import z from "zod";
 import User from "@/models/user.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-import { AVAILABLE_STATUSES, type Status } from "@/enum/status.js";
+import { AVAILABLE_STATUSES } from "@/enum/status.js";
 import { AVAILABLE_ROLES } from "@/enum/role.js";
 import { Op, type WhereOptions } from "sequelize";
 import { authMiddlware } from "@/middleware/auth.js";

@@ -26,35 +26,35 @@ const storeValidator = z.object({
     .max(255, "Local deve ter no máximo 255 caracteres"),
 });
 
-const filesValidator = z.array(
-  z.object({
-    fieldname: z.string("fieldname deve ser uma string").trim(),
-    originalname: z.string("originalname deve ser uma string").trim(),
-    encoding: z.string("encoding deve ser uma string").trim(),
-    mimetype: z.string("mimetype deve ser uma string").trim(),
-    filename: z.string("filename deve ser uma string").trim(),
-    path: z.string("path deve ser uma string").trim(),
-    size: z.coerce
-      .number("size deve ser um número")
-      .max(MAX_FILE_SIZE, "Arquivo muito grande"),
-  }),
-);
+const filesValidator = z.object({
+  files: z
+    .array(
+      z.object({
+        fieldname: z.string("fieldname deve ser uma string").trim(),
+        originalname: z.string("originalname deve ser uma string").trim(),
+        encoding: z.string("encoding deve ser uma string").trim(),
+        mimetype: z.string("mimetype deve ser uma string").trim(),
+        filename: z.string("filename deve ser uma string").trim(),
+        path: z.string("path deve ser uma string").trim(),
+        size: z.coerce
+          .number("size deve ser um número")
+          .max(MAX_FILE_SIZE, "Arquivo muito grande"),
+      }),
+    )
+    .min(1, "Pelo menos um arquivo deve ser enviado")
+    .max(5, "No máximo 5 arquivos podem ser enviados"),
+});
 
 export default class IncidentController implements Controller {
   async store(req: Request, res: Response) {
-    const files = filesValidator.parse(req.files);
+    const files = filesValidator.parse({ files: req.files });
 
-    try {
-      const { shortDescription, description, location, buildingId } =
-        storeValidator.parse(req.body);
+    const { shortDescription, description, location, buildingId } =
+      storeValidator.parse(req.body);
 
-      return res
-        .status(200)
-        .json({ shortDescription, description, location, buildingId, files });
-    } catch (err) {
-      await Promise.all(files.map((currentFile) => rm(currentFile.path)));
-      throw err;
-    }
+    return res
+      .status(200)
+      .json({ shortDescription, description, location, buildingId, files });
   }
 
   registerRoutes(app: Express): void {

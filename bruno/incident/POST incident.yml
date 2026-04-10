@@ -29,6 +29,7 @@ http:
         type: file
         value:
           - /Users/matheusabido/Desktop/Captura de Tela 2026-04-10 às 16.05.40.png
+        disabled: true
   auth: inherit
 
 settings:
