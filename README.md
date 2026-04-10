@@ -59,12 +59,14 @@ Optei por MySQL por preferir uma abordagem relacional para a maioria dos problem
 
 Além das tecnologias que nos foram apontadas, tomei a liberdade de adicionar mais algumas à minha API:
 
-- Pino (logging)
-- BCrypt (hash das senhas)
-- Multer (parse dos multipart/form-data)
-- Sharp (compactar imagens)
-- Zod (validação de body)
-- jsonwebtoken (autenticação)
+- Pino
+- BCrypt
+- Multer
+- Sharp
+- Zod
+- jsonwebtoken
+- MinIO
+- S3 SDK
 
 Também decidi usar typescript, já que acredito que é muito melhor para manutenção do código.
 
@@ -93,6 +95,10 @@ Estava em dúvida entre Zod e VineJS. Trabalhei com AdonisJS por algum tempo e v
 #### jsonwebtoken
 
 Implementação de [JWT](https://www.jwt.io) para node. É excelente para autenticar sem precisar de tabela de tokens no banco, apesar de ser bom uma tabela de tokens revogados num projeto real.
+
+#### MinIO/S3 SDK
+
+MinIO é compatível com SDK do S3, se decidir trocar para AWS é só trocar as credenciais.
 
 ### Documentação
 
