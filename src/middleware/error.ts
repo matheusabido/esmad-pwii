@@ -56,7 +56,9 @@ async function errorMiddleware(
       console.log(err);
     }
   }
-  next(err);
+
+  logger.error(err, "Unhandled error");
+  return res.status(500).json({ error: "Erro interno do servidor" });
 }
 
 export default errorMiddleware;
