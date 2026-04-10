@@ -4,9 +4,6 @@ import z from "zod";
 import { MAX_FILE_SIZE } from "@/config/files.js";
 import { authMiddlware } from "@/middleware/auth.js";
 import upload from "@/service/upload.js";
-import { rm } from "node:fs/promises";
-import { readdirSync } from "node:fs";
-import path from "node:path";
 
 const storeValidator = z.object({
   shortDescription: z
