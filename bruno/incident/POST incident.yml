@@ -1,0 +1,38 @@
+info:
+  name: POST incident
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:3000/incident
+  body:
+    type: multipart-form
+    data:
+      - name: shortDescription
+        type: text
+        value: Resumo aqui
+      - name: description
+        type: text
+        value: Uma descrição aqui
+      - name: buildingId
+        type: text
+        value: "1"
+      - name: location
+        type: text
+        value: testeee
+      - name: pictures
+        type: file
+        value:
+          - /Users/matheusabido/Downloads/WhatsApp Image 2026-02-28 at 19.12.14.jpeg
+      - name: pictures
+        type: file
+        value:
+          - /Users/matheusabido/Desktop/Captura de Tela 2026-04-10 às 16.05.40.png
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

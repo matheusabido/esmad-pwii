@@ -56,7 +56,7 @@ Incident.init(
     },
     priority: {
       type: DataTypes.ENUM(...AVAILABLE_PRIORITIES),
-      allowNull: false,
+      allowNull: true,
     },
     statusId: {
       type: DataTypes.INTEGER,

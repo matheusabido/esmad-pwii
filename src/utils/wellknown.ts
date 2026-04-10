@@ -17,7 +17,7 @@ export function getPolygonCoordinatesByWKT(wkt: string): number[][] {
 export function validatePolygonPoints(wkt: string): string | undefined {
   const points = wkt.split("((")[1]?.split("))")[0]?.split(",");
   if (!points || points.length < 2) {
-    return "Área deve conter pontos válidos.";
+    return "Área deve conter pontos válidos";
   }
 
   const [x1, y1] = points[0]!
@@ -29,10 +29,10 @@ export function validatePolygonPoints(wkt: string): string | undefined {
     .map((p) => Number(p.trim())) as [number, number];
 
   if (isNaN(x1) || isNaN(y1) || isNaN(x2) || isNaN(y2)) {
-    return "Área deve conter coordenadas numéricas válidas.";
+    return "Área deve conter coordenadas numéricas válidas";
   }
 
   if (x1 !== x2 || y1 !== y2) {
-    return "Área deve ser um polígono fechado.";
+    return "Área deve ser um polígono fechado";
   }
 }

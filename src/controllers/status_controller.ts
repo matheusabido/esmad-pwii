@@ -36,7 +36,7 @@ const storeValidator = z.object({
     .max(255, "A descrição deve ter no máximo 255 caracteres"),
   color: z
     .hex("Cor deve ser um código hexadecimal")
-    .length(6, "A cor deve ser uma cor válida."),
+    .length(6, "A cor deve ser uma cor válida"),
 });
 
 const patchValidator = z.object({
@@ -54,7 +54,7 @@ const patchValidator = z.object({
     .optional(),
   color: z
     .hex("Cor deve ser um código hexadecimal")
-    .length(6, "A cor deve ser uma cor válida.")
+    .length(6, "A cor deve ser uma cor válida")
     .optional(),
 });
 

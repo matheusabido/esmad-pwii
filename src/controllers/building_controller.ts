@@ -13,11 +13,11 @@ const storeValidator = z.object({
   name: z
     .string("Nome deve ser um texto")
     .trim()
-    .min(3, "Nome deve ter pelo menos 3 caracteres."),
+    .min(3, "Nome deve ter pelo menos 3 caracteres"),
   description: z
     .string("Descrição deve ser um texto")
     .trim()
-    .min(5, "Descrição deve ter pelo menos 5 caracteres."),
+    .min(5, "Descrição deve ter pelo menos 5 caracteres"),
   area: z
     .string("Área deve ser um texto")
     .trim()
@@ -31,12 +31,12 @@ const patchValidator = z.object({
   name: z
     .string("Nome deve ser um texto")
     .trim()
-    .min(3, "Nome deve ter pelo menos 3 caracteres.")
+    .min(3, "Nome deve ter pelo menos 3 caracteres")
     .optional(),
   description: z
     .string("Descrição deve ser um texto")
     .trim()
-    .min(5, "Descrição deve ter pelo menos 5 caracteres.")
+    .min(5, "Descrição deve ter pelo menos 5 caracteres")
     .optional(),
   area: z
     .string("Área deve ser um texto")
@@ -89,7 +89,7 @@ export default class BuildingController implements Controller {
 
     const building = await Building.findByPk(id);
     if (!building) {
-      return res.status(404).json({ error: "Edifício não encontrado." });
+      return res.status(404).json({ error: "Edifício não encontrado" });
     }
 
     return res.status(200).json(building);
@@ -97,7 +97,7 @@ export default class BuildingController implements Controller {
 
   async store(req: Request, res: Response) {
     if (req.user?.role !== "admin") {
-      return res.status(403).json({ error: "Acesso não autorizado." });
+      return res.status(403).json({ error: "Acesso não autorizado" });
     }
 
     const { name, description, area } = storeValidator.parse(req.body);
@@ -109,7 +109,7 @@ export default class BuildingController implements Controller {
       logger.error(error, "Error while parsing polygon coordinates: " + area);
       return res
         .status(400)
-        .json({ error: "Coordenadas do polígono inválidas." });
+        .json({ error: "Coordenadas do polígono inválidas" });
     }
 
     const building = await Building.create({
@@ -127,7 +127,7 @@ export default class BuildingController implements Controller {
 
   async patch(req: Request, res: Response) {
     if (req.user?.role !== "admin") {
-      return res.status(403).json({ error: "Acesso não autorizado." });
+      return res.status(403).json({ error: "Acesso não autorizado" });
     }
 
     const { id } = findValidator.parse(req.params);
@@ -135,7 +135,7 @@ export default class BuildingController implements Controller {
 
     const building = await Building.findByPk(id);
     if (!building) {
-      return res.status(404).json({ error: "Edifício não encontrado." });
+      return res.status(404).json({ error: "Edifício não encontrado" });
     }
 
     if (name) building.name = name;
@@ -152,7 +152,7 @@ export default class BuildingController implements Controller {
         logger.error(error, "Error while parsing polygon coordinates: " + area);
         return res
           .status(400)
-          .json({ error: "Coordenadas do polígono inválidas." });
+          .json({ error: "Coordenadas do polígono inválidas" });
       }
     }
 
@@ -163,14 +163,14 @@ export default class BuildingController implements Controller {
 
   async delete(req: Request, res: Response) {
     if (req.user?.role !== "admin") {
-      return res.status(403).json({ error: "Acesso não autorizado." });
+      return res.status(403).json({ error: "Acesso não autorizado" });
     }
 
     const { id } = findValidator.parse(req.params);
 
     const building = await Building.findByPk(id);
     if (!building) {
-      return res.status(404).json({ error: "Edifício não encontrado." });
+      return res.status(404).json({ error: "Edifício não encontrado" });
     }
 
     await building.destroy();

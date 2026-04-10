@@ -1,5 +1,6 @@
 import multer from "multer";
 import mime from "mime-types";
+import { MAX_FILE_SIZE } from "@/config/files.js";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -20,7 +21,7 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   limits: {
-    fileSize: 100 * 1024 * 1024,
+    fileSize: MAX_FILE_SIZE,
     files: 5,
   },
 });

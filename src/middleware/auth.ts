@@ -9,7 +9,7 @@ export async function authMiddlware(
 ) {
   const token = req.header("Authorization")?.split(" ")[1];
   if (!token) {
-    return res.status(401).json({ error: "Não autenticado." });
+    return res.status(401).json({ error: "Não autenticado" });
   }
 
   const payload = jwt.verify(token, process.env.JWT_SECRET!, {
@@ -21,7 +21,7 @@ export async function authMiddlware(
 
   const user = await User.findByPk(req.user_id);
   if (!user) {
-    return res.status(401).json({ error: "Usuário não encontrado." });
+    return res.status(401).json({ error: "Usuário não encontrado" });
   }
   req.user = user;
   next();

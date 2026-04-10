@@ -44,7 +44,7 @@ module.exports = {
       },
       priority: {
         type: Sequelize.ENUM("low", "medium", "high"),
-        allowNull: false,
+        allowNull: true,
       },
       statusId: {
         type: Sequelize.INTEGER,
