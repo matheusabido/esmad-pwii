@@ -2,8 +2,7 @@ import sequelize from "@/service/sequelize.js";
 import { DataTypes, Model, type BelongsToGetAssociationMixin } from "sequelize";
 import User from "./user.js";
 import Incident from "./incident.js";
-import { AVAILABLE_STATUSES } from "@/enum/status.js";
-import type Status from "./status.js";
+import { AVAILABLE_STATUSES, type Status } from "@/enum/status.js";
 
 class Comment extends Model {
   declare id: number;

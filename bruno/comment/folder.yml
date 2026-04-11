@@ -1,0 +1,7 @@
+info:
+  name: comment
+  type: folder
+  seq: 6
+
+request:
+  auth: inherit
