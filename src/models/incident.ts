@@ -22,6 +22,7 @@ class Incident extends Model {
   declare priority?: Priority;
   declare statusId?: number;
   declare categoryId: number;
+  declare pictures?: IncidentPicture[];
 
   declare getPictures: HasManyGetAssociationsMixin<IncidentPicture>;
   declare getUser: BelongsToGetAssociationMixin<User>;

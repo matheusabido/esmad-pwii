@@ -60,7 +60,7 @@ async function errorMiddleware(
         {},
       );
 
-      return res.status(400).json({ error: "Erro de validação", details });
+      return res.status(400).json({ error: "Validation Error", details });
     } else if (err.message === "Unexpected end of form") {
       return res.status(422).json({ error: "Fim de formulário inesperado" });
     } else if (process.env.NODE_ENV === "development") {

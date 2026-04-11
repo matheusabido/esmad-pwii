@@ -1,11 +1,12 @@
 import type { Express, Request, Response } from "express";
 import type Controller from "./controller.js";
-import z from "zod";
+import z, { file } from "zod";
 import { MAX_FILE_SIZE } from "@/config/files.js";
 import { authMiddlware } from "@/middleware/auth.js";
 import upload from "@/service/upload.js";
 import s3Client from "@/service/s3.js";
 import {
+  GetObjectCommand,
   PutObjectCommand,
   type PutObjectCommandInput,
 } from "@aws-sdk/client-s3";
@@ -115,6 +116,18 @@ const findValidator = z.object({
     .optional(),
 });
 
+const getPictureValidator = z.object({
+  id: z.coerce
+    .number("id deve ser um número")
+    .int("id deve ser um número inteiro")
+    .positive("id deve ser um número positivo"),
+  pictureId: z.coerce
+    .number("pictureId deve ser um número")
+    .int("pictureId deve ser um número inteiro")
+    .min(1, "pictureId deve ser pelo menos 1")
+    .max(5, "pictureId deve ser no máximo 5"),
+});
+
 const listValidator = z.object({
   page: z.coerce
     .number("page deve ser um número")
@@ -172,6 +185,37 @@ export default class IncidentController implements Controller {
     }
 
     return res.json(incident);
+  }
+
+  async getPicture(req: Request, res: Response) {
+    const { id, pictureId } = getPictureValidator.parse(req.params);
+
+    const incident = await Incident.findByPk(id, { include: ["pictures"] });
+    if (!incident) {
+      throw new AppError(404, "Incidente não encontrado");
+    }
+
+    if (pictureId > incident.pictures!.length) {
+      throw new AppError(404, "Foto não encontrada para este incidente");
+    }
+
+    const picture = incident.pictures![pictureId - 1];
+    const fileStream = await s3Client.send(
+      new GetObjectCommand({
+        Bucket: process.env.S3_BUCKET_NAME!,
+        Key: picture!.pictureUrl,
+      }),
+    );
+
+    const stream = await fileStream.Body?.transformToByteArray();
+    if (!stream) {
+      throw new AppError(500, "Erro ao ler o arquivo da foto");
+    }
+    res.setHeader(
+      "Content-Type",
+      fileStream.ContentType ?? "application/octet-stream",
+    );
+    res.send(stream);
   }
 
   async list(req: Request, res: Response) {
@@ -416,6 +460,7 @@ export default class IncidentController implements Controller {
 
   registerRoutes(app: Express): void {
     app.get("/incidents", authMiddlware, this.list);
+    app.get("/incident/:id/picture/:pictureId", authMiddlware, this.getPicture);
     app.get("/incident/:id", authMiddlware, this.find);
     app.post(
       "/incident",

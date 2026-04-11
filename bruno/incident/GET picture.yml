@@ -1,11 +1,11 @@
 info:
-  name: DELETE incident
+  name: GET picture
   type: http
-  seq: 6
+  seq: 2
 
 http:
-  method: DELETE
-  url: http://localhost:3000/incident/6
+  method: GET
+  url: http://localhost:3000/incident/7/picture/2
   auth: inherit
 
 settings:
