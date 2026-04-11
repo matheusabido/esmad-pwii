@@ -1,4 +1,5 @@
 import User from "@/models/user.js";
+import { AppError } from "@/utils/errors.js";
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 
@@ -9,7 +10,7 @@ export async function authMiddlware(
 ) {
   const token = req.header("Authorization")?.split(" ")[1];
   if (!token) {
-    return res.status(401).json({ error: "Não autenticado" });
+    throw new AppError(401, "Não autenticado");
   }
 
   const payload = jwt.verify(token, process.env.JWT_SECRET!, {
@@ -21,11 +22,11 @@ export async function authMiddlware(
 
   const user = await User.findByPk(req.user_id);
   if (!user) {
-    return res.status(401).json({ error: "Usuário não encontrado" });
+    throw new AppError(404, "Usuário não encontrado");
   }
 
   if (user.status !== "active") {
-    return res.status(403).json({ error: "Usuário inativo" });
+    throw new AppError(403, "Usuário inativo");
   }
 
   req.user = user;

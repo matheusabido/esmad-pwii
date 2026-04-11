@@ -5,6 +5,7 @@ import { Op, type WhereOptions } from "sequelize";
 import Category from "@/models/category.js";
 import { authMiddlware } from "@/middleware/auth.js";
 import { paginate } from "@/utils/paginate.js";
+import { AppError } from "@/utils/errors.js";
 
 const listValidator = z.object({
   name: z.string("O nome deve ser um texto").trim().optional(),
@@ -61,7 +62,7 @@ const patchValidator = z.object({
 export default class CategoryController implements Controller {
   async list(req: Request, res: Response) {
     if (req.user?.role !== "admin") {
-      return res.status(403).json({ error: "Acesso negado" });
+      throw new AppError(403, "Acesso não autorizado");
     }
 
     const { name, page } = listValidator.parse(req.query);
@@ -76,27 +77,27 @@ export default class CategoryController implements Controller {
       limit: 20,
     });
 
-    return res.status(200).json(paginate({ rows, total: count, page }));
+    return res.json(paginate({ rows, total: count, page }));
   }
 
   async find(req: Request, res: Response) {
     if (req.user?.role !== "admin") {
-      return res.status(403).json({ error: "Acesso negado" });
+      throw new AppError(403, "Acesso negado");
     }
 
     const { id } = findValidator.parse(req.params);
 
     const category = await Category.findByPk(id);
     if (!category) {
-      return res.status(404).json({ error: "Categoria não encontrada" });
+      throw new AppError(404, "Categoria não encontrada");
     }
 
-    return res.status(200).json(category);
+    return res.json(category);
   }
 
   async store(req: Request, res: Response) {
     if (req.user?.role !== "admin") {
-      return res.status(403).json({ error: "Acesso negado" });
+      throw new AppError(403, "Acesso negado");
     }
 
     const { name, description, color } = storeValidator.parse(req.body);
@@ -112,7 +113,7 @@ export default class CategoryController implements Controller {
 
   async patch(req: Request, res: Response) {
     if (req.user!.role !== "admin") {
-      return res.status(403).json({ error: "Acesso não autorizado" });
+      throw new AppError(403, "Acesso não autorizado");
     }
 
     const { id } = findValidator.parse(req.params);
@@ -120,7 +121,7 @@ export default class CategoryController implements Controller {
 
     const category = await Category.findByPk(id);
     if (!category) {
-      return res.status(404).json({ error: "Categoria não encontrada" });
+      throw new AppError(404, "Categoria não encontrada");
     }
 
     await category.update({
@@ -129,19 +130,19 @@ export default class CategoryController implements Controller {
       color: color ?? category.color,
     });
 
-    return res.status(200).json(category);
+    return res.json(category);
   }
 
   async delete(req: Request, res: Response) {
     if (req.user!.role !== "admin") {
-      return res.status(403).json({ error: "Acesso não autorizado" });
+      throw new AppError(403, "Acesso não autorizado");
     }
 
     const { id } = findValidator.parse(req.params);
 
     const category = await Category.findByPk(id);
     if (!category) {
-      return res.status(404).json({ error: "Categoria não encontrada" });
+      throw new AppError(404, "Categoria não encontrada");
     }
 
     await category.destroy();

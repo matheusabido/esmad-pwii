@@ -9,6 +9,7 @@ import { AVAILABLE_ROLES } from "@/enum/role.js";
 import { Op, type WhereOptions } from "sequelize";
 import { authMiddlware } from "@/middleware/auth.js";
 import { paginate } from "@/utils/paginate.js";
+import { AppError } from "@/utils/errors.js";
 
 const storeValidator = z.object({
   email: z.email("E-mail inválido").trim(),
@@ -73,22 +74,22 @@ export default class UserController implements Controller {
     const { id } = findValidator.parse(req.params);
 
     if (req.user!.id !== id && req.user!.role !== "admin") {
-      return res.status(403).json({ error: "Acesso não autorizado" });
+      throw new AppError(403, "Acesso não autorizado");
     }
 
     const user = await User.findByPk(id, {
       attributes: ["id", "email", "name", "status", "role"],
     });
     if (!user) {
-      return res.status(404).json({ error: "Usuário não encontrado" });
+      throw new AppError(404, "Usuário não encontrado");
     }
 
-    return res.status(200).json(user);
+    return res.json(user);
   }
 
   async list(req: Request, res: Response) {
     if (req.user!.role !== "admin") {
-      return res.status(403).json({ error: "Acesso não autorizado" });
+      throw new AppError(403, "Acesso não autorizado");
     }
 
     const { page, role, status, name } = listValidator.parse(req.query);
@@ -106,7 +107,7 @@ export default class UserController implements Controller {
       attributes: ["id", "email", "name", "status", "role"],
     });
 
-    return res.status(200).json(paginate({ rows, total: count, page }));
+    return res.json(paginate({ rows, total: count, page }));
   }
 
   async store(req: Request, res: Response) {
@@ -145,12 +146,12 @@ export default class UserController implements Controller {
     });
 
     if (req.user!.id !== id && req.user!.role !== "admin") {
-      return res.status(403).json({ error: "Acesso não autorizado" });
+      throw new AppError(403, "Acesso não autorizado");
     }
 
     const user = await User.findByPk(id);
     if (!user) {
-      return res.status(404).json({ error: "Usuário não encontrado" });
+      throw new AppError(404, "Usuário não encontrado");
     }
 
     if (name) user.name = name;
@@ -162,7 +163,7 @@ export default class UserController implements Controller {
 
     await user.save();
 
-    res.status(200).json({
+    res.json({
       id: user.id,
       email: user.email,
       name: user.name,
@@ -181,12 +182,13 @@ export default class UserController implements Controller {
     });
 
     if (!user) {
-      return res.status(401).json({ error: "Credenciais inválidas" });
+      await bcrypt.compare(body.password, "dummy_text");
+      throw new AppError(401, "Credenciais inválidas");
     }
 
     const isMatch = await bcrypt.compare(body.password, user.password);
     if (!isMatch) {
-      return res.status(401).json({ error: "Credenciais inválidas" });
+      throw new AppError(401, "Credenciais inválidas");
     }
 
     const token = jwt.sign(
@@ -197,7 +199,7 @@ export default class UserController implements Controller {
       { expiresIn: "1h", algorithm: "HS256", issuer: "pwii" },
     );
 
-    return res.status(200).json({
+    return res.json({
       id: user.id,
       email: user.email,
       name: user.name,

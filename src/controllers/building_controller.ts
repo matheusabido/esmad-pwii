@@ -8,6 +8,7 @@ import { Op, type WhereOptions } from "sequelize";
 import { paginate } from "@/utils/paginate.js";
 import { getPolygonCoordinatesByWKT } from "@/utils/wellknown.js";
 import logger from "@/service/logger.js";
+import { AppError } from "@/utils/errors.js";
 
 const storeValidator = z.object({
   name: z
@@ -82,7 +83,7 @@ export default class BuildingController implements Controller {
       limit: 20,
     });
 
-    return res.status(200).json(paginate({ rows, total: count, page }));
+    return res.json(paginate({ rows, total: count, page }));
   }
 
   async find(req: Request, res: Response) {
@@ -90,15 +91,15 @@ export default class BuildingController implements Controller {
 
     const building = await Building.findByPk(id);
     if (!building) {
-      return res.status(404).json({ error: "Edifício não encontrado" });
+      throw new AppError(404, "Edifício não encontrado");
     }
 
-    return res.status(200).json(building);
+    return res.json(building);
   }
 
   async store(req: Request, res: Response) {
     if (req.user?.role !== "admin") {
-      return res.status(403).json({ error: "Acesso não autorizado" });
+      throw new AppError(403, "Acesso não autorizado");
     }
 
     const { name, description, area } = storeValidator.parse(req.body);
@@ -108,9 +109,7 @@ export default class BuildingController implements Controller {
       coordinates = getPolygonCoordinatesByWKT(area);
     } catch (error) {
       logger.error(error, "Error while parsing polygon coordinates: " + area);
-      return res
-        .status(400)
-        .json({ error: "Coordenadas do polígono inválidas" });
+      throw new AppError(400, "Coordenadas do polígono inválidas");
     }
 
     const building = await Building.create({
@@ -128,7 +127,7 @@ export default class BuildingController implements Controller {
 
   async patch(req: Request, res: Response) {
     if (req.user?.role !== "admin") {
-      return res.status(403).json({ error: "Acesso não autorizado" });
+      throw new AppError(403, "Acesso não autorizado");
     }
 
     const { id } = findValidator.parse(req.params);
@@ -136,7 +135,7 @@ export default class BuildingController implements Controller {
 
     const building = await Building.findByPk(id);
     if (!building) {
-      return res.status(404).json({ error: "Edifício não encontrado" });
+      throw new AppError(404, "Edifício não encontrado");
     }
 
     if (name) building.name = name;
@@ -151,27 +150,25 @@ export default class BuildingController implements Controller {
         };
       } catch (error) {
         logger.error(error, "Error while parsing polygon coordinates: " + area);
-        return res
-          .status(400)
-          .json({ error: "Coordenadas do polígono inválidas" });
+        throw new AppError(400, "Coordenadas do polígono inválidas");
       }
     }
 
     await building.save();
 
-    return res.status(200).json(building);
+    return res.json(building);
   }
 
   async delete(req: Request, res: Response) {
     if (req.user?.role !== "admin") {
-      return res.status(403).json({ error: "Acesso não autorizado" });
+      throw new AppError(403, "Acesso não autorizado");
     }
 
     const { id } = findValidator.parse(req.params);
 
     const building = await Building.findByPk(id);
     if (!building) {
-      return res.status(404).json({ error: "Edifício não encontrado" });
+      throw new AppError(404, "Edifício não encontrado");
     }
 
     await building.destroy();
