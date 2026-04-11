@@ -1,9 +1,7 @@
-export class UploadError extends Error {
-  rollbackKeys: string[];
-
-  constructor(message: string, rollbackKeys: string[]) {
+export class AppError extends Error {
+  statusCode: number;
+  constructor(statusCode: number, message: string) {
     super(message);
-    this.name = "UploadError";
-    this.rollbackKeys = rollbackKeys;
+    this.statusCode = statusCode;
   }
 }

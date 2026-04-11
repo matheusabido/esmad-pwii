@@ -23,6 +23,11 @@ export async function authMiddlware(
   if (!user) {
     return res.status(401).json({ error: "Usuário não encontrado" });
   }
+
+  if (user.status !== "active") {
+    return res.status(403).json({ error: "Usuário inativo" });
+  }
+
   req.user = user;
   next();
 }

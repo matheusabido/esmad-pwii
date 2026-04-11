@@ -1,5 +1,5 @@
 import sequelize from "@/service/sequelize.js";
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model, type BelongsToGetAssociationMixin } from "sequelize";
 import Incident from "./incident.js";
 
 class IncidentPicture extends Model {
@@ -7,7 +7,9 @@ class IncidentPicture extends Model {
   declare incidentId: number;
   declare pictureUrl: string;
   declare title: string;
-  declare description: string;
+  declare description?: string;
+
+  declare getIncident: BelongsToGetAssociationMixin<Incident>;
 }
 
 IncidentPicture.init(
@@ -36,7 +38,7 @@ IncidentPicture.init(
     },
     description: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
   },
   { sequelize, tableName: "incident_pictures", modelName: "incident_picture" },

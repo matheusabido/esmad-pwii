@@ -1,7 +1,5 @@
 import logger from "@/service/logger.js";
-import s3Client from "@/service/s3.js";
-import { UploadError } from "@/utils/errors.js";
-import { DeleteObjectCommand } from "@aws-sdk/client-s3";
+import { AppError } from "@/utils/errors.js";
 import type { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { MulterError } from "multer";
@@ -50,38 +48,8 @@ async function errorMiddleware(
         default:
           return res.status(400).json({ error: "Erro de upload" });
       }
-    } else if (err instanceof UploadError) {
-      if (err.rollbackKeys.length > 0) {
-        logger.debug(
-          "Rolling back the following keys: " + err.rollbackKeys.join(", "),
-        );
-
-        try {
-          await Promise.all(
-            err.rollbackKeys.map((key) =>
-              s3Client.send(
-                new DeleteObjectCommand({
-                  Bucket: process.env.S3_BUCKET_NAME,
-                  Key: key,
-                }),
-              ),
-            ),
-          );
-          logger.debug(
-            "Successfully rolled back " + err.rollbackKeys.length + " keys",
-          );
-        } catch (deleteError) {
-          logger.error(
-            deleteError,
-            "An error occurred while trying to rollback files. Manual intervention may be required to delete the following keys: " +
-              err.rollbackKeys.join(", "),
-          );
-        }
-      }
-
-      return res
-        .status(500)
-        .json({ error: "Ocorreu um erro ao enviar o arquivo" });
+    } else if (err instanceof AppError) {
+      return res.status(err.statusCode).json({ error: err.message });
     } else if (err instanceof SyntaxError) {
       return res.status(400).json({ error: "JSON inválido" });
     } else if (err instanceof jwt.JsonWebTokenError) {

@@ -1,10 +1,16 @@
 import sequelize from "@/service/sequelize.js";
-import { DataTypes, Model } from "sequelize";
+import {
+  DataTypes,
+  Model,
+  type BelongsToGetAssociationMixin,
+  type HasManyGetAssociationsMixin,
+} from "sequelize";
 import User from "./user.js";
 import Building from "./building.js";
 import { AVAILABLE_PRIORITIES, type Priority } from "@/enum/priority.js";
 import Status from "./status.js";
 import Category from "./category.js";
+import type IncidentPicture from "./incident_picture.js";
 
 class Incident extends Model {
   declare id: number;
@@ -13,9 +19,15 @@ class Incident extends Model {
   declare description: string;
   declare buildingId: number;
   declare location: string;
-  declare priority: Priority;
-  declare statusId: number;
+  declare priority?: Priority;
+  declare statusId?: number;
   declare categoryId: number;
+
+  declare getPictures: HasManyGetAssociationsMixin<IncidentPicture>;
+  declare getUser: BelongsToGetAssociationMixin<User>;
+  declare getBuilding: BelongsToGetAssociationMixin<Building>;
+  declare getStatus: BelongsToGetAssociationMixin<Status>;
+  declare getCategory: BelongsToGetAssociationMixin<Category>;
 }
 
 Incident.init(
@@ -60,7 +72,7 @@ Incident.init(
     },
     statusId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
       references: {
         model: Status,
         key: "id",

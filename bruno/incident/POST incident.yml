@@ -29,7 +29,12 @@ http:
         type: file
         value:
           - /Users/matheusabido/Desktop/Captura de Tela 2026-04-10 às 16.05.40.png
-        disabled: true
+      - name: categoryId
+        type: text
+        value: "1"
+      - name: picturesData
+        type: text
+        value: '[{"title":"teste"},{"title":"teste2"}]'
   auth: inherit
 
 settings:

@@ -9,9 +9,15 @@ import {
   PutObjectCommand,
   type PutObjectCommandInput,
 } from "@aws-sdk/client-s3";
-import { readFile } from "node:fs/promises";
-import { UploadError } from "@/utils/errors.js";
+import { readFile, rm } from "node:fs/promises";
 import logger from "@/service/logger.js";
+import { s3DeleteKeys } from "@/utils/s3.js";
+import Incident from "@/models/incident.js";
+import sequelize from "@/service/sequelize.js";
+import { AppError } from "@/utils/errors.js";
+import IncidentPicture from "@/models/incident_picture.js";
+import Building from "@/models/building.js";
+import Category from "@/models/category.js";
 
 const storeValidator = z.object({
   shortDescription: z
@@ -29,6 +35,40 @@ const storeValidator = z.object({
     .trim()
     .min(5, "Local deve ter pelo menos 5 caracteres")
     .max(255, "Local deve ter no máximo 255 caracteres"),
+  categoryId: z.coerce
+    .number("categoryId deve ser um número")
+    .int("categoryId deve ser um número inteiro")
+    .positive("categoryId deve ser um número positivo"),
+  picturesData: z
+    .string()
+    .transform((val) => {
+      try {
+        return JSON.parse(val);
+      } catch {
+        throw new AppError(400, "Dados das fotos devem ser um JSON válido");
+      }
+    })
+    .pipe(
+      z
+        .array(
+          z.object({
+            title: z
+              .string("O título da foto deve ser uma string")
+              .trim()
+              .min(3, "O título da foto deve ter pelo menos 3 caracteres")
+              .max(255, "O título da foto deve ter no máximo 255 caracteres"),
+            description: z
+              .string("A descrição da foto deve ser uma string")
+              .trim()
+              .min(5, "A descrição da foto deve ter pelo menos 5 caracteres")
+              .max(255, "A descrição da foto deve ter no máximo 255 caracteres")
+              .optional(),
+          }),
+          "Os dados das fotos deve ser uma lista",
+        )
+        .min(1, "Dados das fotos devem ser fornecidos para cada foto enviada")
+        .max(5, "No máximo 5 fotos podem ser enviadas"),
+    ),
 });
 
 const filesValidator = z.object({
@@ -45,6 +85,7 @@ const filesValidator = z.object({
           .number("size deve ser um número")
           .max(MAX_FILE_SIZE, "Arquivo muito grande"),
       }),
+      "É obrigatório enviar pelo menos uma foto",
     )
     .min(1, "Pelo menos um arquivo deve ser enviado")
     .max(5, "No máximo 5 arquivos podem ser enviados"),
@@ -54,15 +95,44 @@ export default class IncidentController implements Controller {
   async store(req: Request, res: Response) {
     const { files } = filesValidator.parse({ files: req.files });
 
-    const { shortDescription, description, location, buildingId } =
-      storeValidator.parse(req.body);
+    const {
+      shortDescription,
+      description,
+      location,
+      buildingId,
+      categoryId,
+      picturesData,
+    } = storeValidator.parse(req.body);
+
+    if (picturesData.length < files.length) {
+      throw new AppError(
+        400,
+        "Dados das fotos insuficientes para as fotos enviadas",
+      );
+    }
+
+    const building = await Building.findByPk(buildingId, {
+      raw: true,
+      attributes: ["id", "name"],
+    });
+    if (!building) {
+      throw new AppError(404, "Edifício não encontrado");
+    }
+
+    const category = await Category.findByPk(categoryId, {
+      raw: true,
+      attributes: ["id", "name"],
+    });
+    if (!category) {
+      throw new AppError(404, "Categoria não encontrada");
+    }
 
     const picturesUrl: string[] = [];
     for (const file of files) {
       const fileContent = await readFile(file.path);
       const uploadParams = {
         Bucket: process.env.S3_BUCKET_NAME!,
-        Key: `incidents/${file.filename}`,
+        Key: `incidents/${Date.now()}_${file.filename}`,
         Body: fileContent,
         ContentType: file.mimetype,
       } satisfies PutObjectCommandInput;
@@ -72,13 +142,67 @@ export default class IncidentController implements Controller {
         picturesUrl.push(uploadParams.Key);
       } catch (error) {
         logger.error(error, "An error occurred while trying to upload a file");
-        throw new UploadError("Erro ao enviar arquivo para o S3", picturesUrl);
+        await s3DeleteKeys(picturesUrl);
+        throw new AppError(500, "Erro ao processar os arquivos");
       }
     }
 
-    return res
-      .status(200)
-      .json({ shortDescription, description, location, buildingId, files });
+    const tx = await sequelize.transaction();
+
+    try {
+      const incident = await Incident.create(
+        {
+          userId: req.user!.id,
+          shortDescription,
+          description,
+          buildingId,
+          location,
+          categoryId,
+        },
+        { transaction: tx },
+      );
+
+      const pictures = picturesUrl.map((url, index) => {
+        const data = picturesData[index]!;
+        return {
+          incidentId: incident.id,
+          pictureUrl: url,
+          title: data.title,
+          description: data.description,
+        };
+      });
+
+      const incidentPictures = await IncidentPicture.bulkCreate(pictures, {
+        transaction: tx,
+      });
+
+      await tx.commit();
+      await Promise.all(files?.map((file) => rm(file.path)) ?? []);
+
+      return res.status(201).json({
+        id: incident.id,
+        shortDescription: incident.shortDescription,
+        description: incident.description,
+        location: incident.location,
+        buildingId: incident.buildingId,
+        categoryId: incident.categoryId,
+        pictures: incidentPictures.map((pic) => ({
+          id: pic.id,
+          pictureUrl: pic.pictureUrl,
+          title: pic.title,
+          description: pic.description,
+        })),
+        building,
+        category,
+      });
+    } catch (error) {
+      await tx.rollback();
+      logger.error(
+        error,
+        "An error occurred while trying to create an incident",
+      );
+      throw new AppError(500, "Erro ao criar o incidente");
+    }
   }
 
   registerRoutes(app: Express): void {

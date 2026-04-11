@@ -1,8 +1,10 @@
 import { AVAILABLE_ROLES } from "@/enum/role.js";
 import { AVAILABLE_STATUSES, type Status } from "@/enum/status.js";
 import sequelize from "@/service/sequelize.js";
-import { DataTypes, Model } from "sequelize";
+import { DataTypes, Model, type HasManyGetAssociationsMixin } from "sequelize";
 import bcrypt from "bcrypt";
+import type Incident from "./incident.js";
+import type Comment from "./comment.js";
 
 class User extends Model {
   declare id: number;
@@ -11,6 +13,9 @@ class User extends Model {
   declare status: Status;
   declare role: string;
   declare password: string;
+
+  declare getIncidents: HasManyGetAssociationsMixin<Incident>;
+  declare getComments: HasManyGetAssociationsMixin<Comment>;
 }
 
 User.init(
