@@ -18,6 +18,7 @@ import { AppError } from "@/utils/errors.js";
 import IncidentPicture from "@/models/incident_picture.js";
 import Building from "@/models/building.js";
 import Category from "@/models/category.js";
+import { AVAILABLE_PRIORITIES } from "@/enum/priority.js";
 
 const storeValidator = z.object({
   shortDescription: z
@@ -69,6 +70,66 @@ const storeValidator = z.object({
         .min(1, "Dados das fotos devem ser fornecidos para cada foto enviada")
         .max(5, "No máximo 5 fotos podem ser enviadas"),
     ),
+});
+
+const patchValidator = z.object({
+  shortDescription: z
+    .string("Resumo deve ser um texto")
+    .trim()
+    .min(5, "Resumo deve ter pelo menos 5 caracteres")
+    .max(255, "Resumo deve ter no máximo 255 caracteres")
+    .optional(),
+  description: z.string("Descrição deve ser um texto").trim().optional(),
+  location: z
+    .string("Local deve ser um texto")
+    .trim()
+    .min(5, "Local deve ter pelo menos 5 caracteres")
+    .max(255, "Local deve ter no máximo 255 caracteres")
+    .optional(),
+  priority: z.enum(AVAILABLE_PRIORITIES).optional(),
+  statusId: z.coerce
+    .number("statusId deve ser um número")
+    .int("statusId deve ser um número inteiro")
+    .positive("statusId deve ser um número positivo")
+    .optional(),
+  categoryId: z.coerce
+    .number("categoryId deve ser um número")
+    .int("categoryId deve ser um número inteiro")
+    .positive("categoryId deve ser um número positivo")
+    .optional(),
+});
+
+const findValidator = z.object({
+  id: z.coerce
+    .number("id deve ser um número")
+    .int("id deve ser um número inteiro")
+    .positive("id deve ser um número positivo")
+    .optional(),
+});
+
+const listValidator = z.object({
+  page: z.coerce
+    .number("page deve ser um número")
+    .int("page deve ser um número inteiro")
+    .positive("page deve ser um número positivo")
+    .optional(),
+  priority: z.enum(AVAILABLE_PRIORITIES).optional(),
+  statusId: z.coerce
+    .number("statusId deve ser um número")
+    .int("statusId deve ser um número inteiro")
+    .positive("statusId deve ser um número positivo")
+    .optional(),
+  categoryId: z.coerce
+    .number("categoryId deve ser um número")
+    .int("categoryId deve ser um número inteiro")
+    .positive("categoryId deve ser um número positivo")
+    .optional(),
+  query: z
+    .string("query deve ser um texto")
+    .trim()
+    .min(3, "query deve ter pelo menos 3 caracteres")
+    .max(255, "query deve ter no máximo 255 caracteres")
+    .optional(),
 });
 
 const filesValidator = z.object({
