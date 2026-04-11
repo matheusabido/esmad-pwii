@@ -1,13 +1,11 @@
 info:
-  name: file
+  name: GET incident
   type: http
   seq: 1
 
 http:
-  method: POST
-  url: http://localhost:3000/file
-  body:
-    type: multipart-form
+  method: GET
+  url: http://localhost:3000/incident/6
   auth: inherit
 
 settings:

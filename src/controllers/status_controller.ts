@@ -72,6 +72,7 @@ export default class StatusController implements Controller {
     const { rows, count } = await Status.findAndCountAll({
       where: where,
       offset: (page - 1) * 20,
+      order: [["id", "DESC"]],
       limit: 20,
     });
 

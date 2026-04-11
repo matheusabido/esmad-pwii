@@ -102,6 +102,7 @@ export default class UserController implements Controller {
       limit: 20,
       offset: (page - 1) * 20,
       where,
+      order: [["name", "DESC"]],
       attributes: ["id", "email", "name", "status", "role"],
     });
 

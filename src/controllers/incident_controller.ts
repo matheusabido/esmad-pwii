@@ -19,6 +19,9 @@ import IncidentPicture from "@/models/incident_picture.js";
 import Building from "@/models/building.js";
 import Category from "@/models/category.js";
 import { AVAILABLE_PRIORITIES } from "@/enum/priority.js";
+import Status from "@/models/status.js";
+import { Op } from "sequelize";
+import { paginate } from "@/utils/paginate.js";
 
 const storeValidator = z.object({
   shortDescription: z
@@ -97,6 +100,11 @@ const patchValidator = z.object({
     .int("categoryId deve ser um número inteiro")
     .positive("categoryId deve ser um número positivo")
     .optional(),
+  buildingId: z.coerce
+    .number("buildingId deve ser um número")
+    .int("buildingId deve ser um número inteiro")
+    .positive("buildingId deve ser um número positivo")
+    .optional(),
 });
 
 const findValidator = z.object({
@@ -153,6 +161,57 @@ const filesValidator = z.object({
 });
 
 export default class IncidentController implements Controller {
+  async find(req: Request, res: Response) {
+    const { id } = findValidator.parse(req.params);
+
+    const incident = await Incident.findByPk(id, {
+      include: ["pictures", "building", "category", "status"],
+    });
+    if (!incident) {
+      throw new AppError(404, "Incidente não encontrado");
+    }
+
+    return res.json(incident);
+  }
+
+  async list(req: Request, res: Response) {
+    const {
+      page = 1,
+      priority,
+      statusId,
+      categoryId,
+      query,
+    } = listValidator.parse(req.query);
+
+    const where: any = {};
+    if (priority) where.priority = priority;
+    if (statusId) where.statusId = statusId;
+    if (categoryId) where.categoryId = categoryId;
+    if (query)
+      where[Op.or] = [
+        { shortDescription: { [Op.iLike]: `%${query}%` } },
+        { description: { [Op.iLike]: `%${query}%` } },
+      ];
+
+    const { rows, count: total } = await Incident.findAndCountAll({
+      where,
+      include: [
+        { model: Building, as: "building", attributes: ["id", "name"] },
+        {
+          model: Category,
+          as: "category",
+          attributes: ["id", "name", "color"],
+        },
+        { model: Status, as: "status", attributes: ["id", "name", "color"] },
+      ],
+      order: [["createdAt", "DESC"]],
+      offset: (page - 1) * 20,
+      limit: 20,
+    });
+
+    return res.json(paginate({ rows, total, page }));
+  }
+
   async store(req: Request, res: Response) {
     const { files } = filesValidator.parse({ files: req.files });
 
@@ -266,12 +325,105 @@ export default class IncidentController implements Controller {
     }
   }
 
+  async patch(req: Request, res: Response) {
+    const { id } = findValidator.parse(req.params);
+    const {
+      shortDescription,
+      description,
+      location,
+      priority,
+      statusId,
+      categoryId,
+      buildingId,
+    } = patchValidator.parse(req.body);
+
+    const incident = await Incident.findByPk(id);
+    if (!incident) {
+      throw new AppError(404, "Incidente não encontrado");
+    }
+
+    if (req.user!.role !== "admin" && incident.userId !== req.user!.id) {
+      throw new AppError(
+        403,
+        "Você não tem permissão para editar este incidente",
+      );
+    }
+
+    if (categoryId) {
+      const category = await Category.findByPk(categoryId, {
+        raw: true,
+        attributes: ["id", "name"],
+      });
+      if (!category) {
+        throw new AppError(404, "Categoria não encontrada");
+      }
+
+      incident.categoryId = categoryId;
+    }
+
+    if (buildingId) {
+      const building = await Building.findByPk(buildingId, {
+        raw: true,
+        attributes: ["id", "name"],
+      });
+      if (!building) {
+        throw new AppError(404, "Edifício não encontrado");
+      }
+
+      incident.buildingId = buildingId;
+    }
+
+    if (req.user!.role === "admin" && statusId) {
+      const status = await Status.findByPk(statusId, {
+        raw: true,
+        attributes: ["id", "name"],
+      });
+      if (!status) {
+        throw new AppError(404, "Status não encontrado");
+      }
+
+      incident.statusId = statusId;
+    }
+
+    if (req.user!.role === "admin" && priority) incident.priority = priority;
+
+    if (shortDescription) incident.shortDescription = shortDescription;
+    if (description) incident.description = description;
+    if (location) incident.location = location;
+
+    await incident.save();
+    return res.json(incident);
+  }
+
+  async delete(req: Request, res: Response) {
+    const { id } = findValidator.parse(req.params);
+
+    const incident = await Incident.findByPk(id);
+    if (!incident) {
+      throw new AppError(404, "Incidente não encontrado");
+    }
+
+    if (req.user!.role !== "admin" && incident.userId !== req.user!.id) {
+      throw new AppError(
+        403,
+        "Você não tem permissão para deletar este incidente",
+      );
+    }
+
+    await incident.destroy();
+    return res.status(204).send();
+  }
+
   registerRoutes(app: Express): void {
+    app.get("/incidents", authMiddlware, this.list);
+    app.get("/incident/:id", authMiddlware, this.find);
     app.post(
       "/incident",
       authMiddlware,
       upload.array("pictures", 5),
       this.store,
     );
+    app.patch("/incident/:id", authMiddlware, this.patch);
+    app.delete("/incident/:id", authMiddlware, this.delete);
   }
 }

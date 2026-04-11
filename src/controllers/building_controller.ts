@@ -78,6 +78,7 @@ export default class BuildingController implements Controller {
     const { rows, count } = await Building.findAndCountAll({
       where: where,
       offset: (page - 1) * 20,
+      order: [["name", "ASC"]],
       limit: 20,
     });
 

@@ -1,18 +1,16 @@
 info:
-  name: POST category
+  name: PATCH incident
   type: http
-  seq: 3
+  seq: 4
 
 http:
-  method: POST
-  url: http://localhost:3000/category
+  method: PATCH
+  url: http://localhost:3000/incident/6
   body:
     type: json
     data: |-
       {
-        "name": "teste2",
-        "description": "teset123",
-        "color": "aa33bb"
+        "priority": "high"
       }
   auth: inherit
 
