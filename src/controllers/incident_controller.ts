@@ -4,6 +4,14 @@ import z from "zod";
 import { MAX_FILE_SIZE } from "@/config/files.js";
 import { authMiddlware } from "@/middleware/auth.js";
 import upload from "@/service/upload.js";
+import s3Client from "@/service/s3.js";
+import {
+  PutObjectCommand,
+  type PutObjectCommandInput,
+} from "@aws-sdk/client-s3";
+import { readFile } from "node:fs/promises";
+import { UploadError } from "@/utils/errors.js";
+import logger from "@/service/logger.js";
 
 const storeValidator = z.object({
   shortDescription: z
@@ -44,10 +52,29 @@ const filesValidator = z.object({
 
 export default class IncidentController implements Controller {
   async store(req: Request, res: Response) {
-    const files = filesValidator.parse({ files: req.files });
+    const { files } = filesValidator.parse({ files: req.files });
 
     const { shortDescription, description, location, buildingId } =
       storeValidator.parse(req.body);
+
+    const picturesUrl: string[] = [];
+    for (const file of files) {
+      const fileContent = await readFile(file.path);
+      const uploadParams = {
+        Bucket: process.env.S3_BUCKET_NAME!,
+        Key: `incidents/${file.filename}`,
+        Body: fileContent,
+        ContentType: file.mimetype,
+      } satisfies PutObjectCommandInput;
+
+      try {
+        await s3Client.send(new PutObjectCommand(uploadParams));
+        picturesUrl.push(uploadParams.Key);
+      } catch (error) {
+        logger.error(error, "An error occurred while trying to upload a file");
+        throw new UploadError("Erro ao enviar arquivo para o S3", picturesUrl);
+      }
+    }
 
     return res
       .status(200)

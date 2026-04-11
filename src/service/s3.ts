@@ -17,13 +17,13 @@ const s3Client = new S3Client({
 export async function initS3() {
   try {
     await s3Client.send(
-      new GetBucketAclCommand({ Bucket: process.env.AWS_S3_BUCKET_NAME! }),
+      new GetBucketAclCommand({ Bucket: process.env.S3_BUCKET_NAME! }),
     );
   } catch (error: any) {
     if (error.name === "NoSuchBucket") {
       try {
         await s3Client.send(
-          new CreateBucketCommand({ Bucket: process.env.AWS_S3_BUCKET_NAME! }),
+          new CreateBucketCommand({ Bucket: process.env.S3_BUCKET_NAME! }),
         );
       } catch (err) {
         console.error("Error creating S3 bucket:", err);
