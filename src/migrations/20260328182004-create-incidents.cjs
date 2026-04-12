@@ -3,7 +3,7 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.startTransaction(async (tx) => {
+    await queryInterface.sequelize.transaction(async (tx) => {
       await queryInterface.createTable(
         "incidents",
         {
