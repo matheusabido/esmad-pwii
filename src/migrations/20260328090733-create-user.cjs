@@ -1,5 +1,7 @@
 "use strict";
 /** @type {import('sequelize-cli').Migration} */
+const bcrypt = require("bcrypt");
+
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.sequelize.transaction(async (t) => {
@@ -56,6 +58,18 @@ module.exports = {
       await queryInterface.addIndex("users", ["role"], {
         transaction: t,
       });
+
+      await queryInterface.bulkInsert("users", [
+        {
+          email: "admin@pwiiadmin.com",
+          name: "Admin",
+          password: bcrypt.hashSync("admin123", 10),
+          status: "active",
+          role: "admin",
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        },
+      ]);
     });
   },
   async down(queryInterface, Sequelize) {

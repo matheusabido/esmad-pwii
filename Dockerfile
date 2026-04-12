@@ -20,6 +20,7 @@ COPY .sequelizerc.cjs ./
 RUN npm ci --omit=dev
 
 COPY --from=builder /app/dist ./src
+RUN mkdir tmp
 
 EXPOSE 3000
 CMD ["node", "src/index.js"]
