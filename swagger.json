@@ -1,1204 +1,1460 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "Swagger Petstore - OpenAPI 3.0",
-    "description": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.  You can find out more about\nSwagger at [https://swagger.io](https://swagger.io). In the third iteration of the pet store, we've switched to the design first approach!\nYou can now help us improve the API whether it's by making changes to the definition itself or to the code.\nThat way, with time, we can improve the API in general, and expose some of the new features in OAS3.\n\nSome useful links:\n- [The Pet Store repository](https://github.com/swagger-api/swagger-petstore)\n- [The source API definition for the Pet Store](https://github.com/swagger-api/swagger-petstore/blob/master/src/main/resources/openapi.yaml)",
-    "termsOfService": "https://swagger.io/terms/",
-    "contact": {
-      "email": "apiteam@swagger.io"
-    },
-    "license": {
-      "name": "Apache 2.0",
-      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
-    },
-    "version": "1.0.27"
-  },
-  "externalDocs": {
-    "description": "Find out more about Swagger",
-    "url": "https://swagger.io"
+    "title": "PWII API",
+    "version": "1.0.0",
+    "description": "API do projeto PWII."
   },
   "tags": [
-    {
-      "name": "pet",
-      "description": "Everything about your Pets",
-      "externalDocs": {
-        "description": "Find out more",
-        "url": "https://swagger.io"
-      }
-    },
-    {
-      "name": "store",
-      "description": "Access to Petstore orders",
-      "externalDocs": {
-        "description": "Find out more about our store",
-        "url": "https://swagger.io"
-      }
-    },
-    {
-      "name": "user",
-      "description": "Operations about user"
-    }
+    { "name": "Auth" },
+    { "name": "Users" },
+    { "name": "Statuses" },
+    { "name": "Categories" },
+    { "name": "Buildings" },
+    { "name": "Incidents" },
+    { "name": "Comments" }
   ],
   "paths": {
-    "/pet": {
-      "put": {
-        "tags": ["pet"],
-        "summary": "Update an existing pet.",
-        "description": "Update an existing pet by Id.",
-        "operationId": "updatePet",
+    "/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Login do usuario",
+        "operationId": "loginUser",
         "requestBody": {
-          "description": "Update an existent pet in the store",
+          "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Pet"
-              }
-            },
-            "application/xml": {
-              "schema": {
-                "$ref": "#/components/schemas/Pet"
-              }
-            },
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "$ref": "#/components/schemas/Pet"
-              }
+              "schema": { "$ref": "#/components/schemas/UserLogin" }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
-            "description": "Successful operation",
+            "description": "Login realizado",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Pet"
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/Pet"
-                }
+                "schema": { "$ref": "#/components/schemas/UserWithToken" }
               }
             }
           },
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "Pet not found"
-          },
-          "422": {
-            "description": "Validation exception"
-          },
-          "default": {
-            "description": "Unexpected error"
-          }
-        },
-        "security": [
-          {
-            "petstore_auth": ["write:pets", "read:pets"]
-          }
-        ]
-      },
-      "post": {
-        "tags": ["pet"],
-        "summary": "Add a new pet to the store.",
-        "description": "Add a new pet to the store.",
-        "operationId": "addPet",
-        "requestBody": {
-          "description": "Create a new pet in the store",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Pet"
-              }
-            },
-            "application/xml": {
-              "schema": {
-                "$ref": "#/components/schemas/Pet"
-              }
-            },
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "$ref": "#/components/schemas/Pet"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Pet"
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/Pet"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "422": {
-            "description": "Validation exception"
-          },
-          "default": {
-            "description": "Unexpected error"
-          }
-        },
-        "security": [
-          {
-            "petstore_auth": ["write:pets", "read:pets"]
-          }
-        ]
-      }
-    },
-    "/pet/findByStatus": {
-      "get": {
-        "tags": ["pet"],
-        "summary": "Finds Pets by status.",
-        "description": "Multiple status values can be provided with comma separated strings.",
-        "operationId": "findPetsByStatus",
-        "parameters": [
-          {
-            "name": "status",
-            "in": "query",
-            "description": "Status values that need to be considered for filter",
-            "required": true,
-            "explode": true,
-            "schema": {
-              "type": "string",
-              "default": "available",
-              "enum": ["available", "pending", "sold"]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Pet"
-                  }
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Pet"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid status value"
-          },
-          "default": {
-            "description": "Unexpected error"
-          }
-        },
-        "security": [
-          {
-            "petstore_auth": ["write:pets", "read:pets"]
-          }
-        ]
-      }
-    },
-    "/pet/findByTags": {
-      "get": {
-        "tags": ["pet"],
-        "summary": "Finds Pets by tags.",
-        "description": "Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.",
-        "operationId": "findPetsByTags",
-        "parameters": [
-          {
-            "name": "tags",
-            "in": "query",
-            "description": "Tags to filter by",
-            "required": true,
-            "explode": true,
-            "schema": {
-              "type": "array",
-              "items": {
-                "type": "string"
-              }
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Pet"
-                  }
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Pet"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid tag value"
-          },
-          "default": {
-            "description": "Unexpected error"
-          }
-        },
-        "security": [
-          {
-            "petstore_auth": ["write:pets", "read:pets"]
-          }
-        ]
-      }
-    },
-    "/pet/{petId}": {
-      "get": {
-        "tags": ["pet"],
-        "summary": "Find pet by ID.",
-        "description": "Returns a single pet.",
-        "operationId": "getPetById",
-        "parameters": [
-          {
-            "name": "petId",
-            "in": "path",
-            "description": "ID of pet to return",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Pet"
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/Pet"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "Pet not found"
-          },
-          "default": {
-            "description": "Unexpected error"
-          }
-        },
-        "security": [
-          {
-            "api_key": []
-          },
-          {
-            "petstore_auth": ["write:pets", "read:pets"]
-          }
-        ]
-      },
-      "post": {
-        "tags": ["pet"],
-        "summary": "Updates a pet in the store with form data.",
-        "description": "Updates a pet resource based on the form data.",
-        "operationId": "updatePetWithForm",
-        "parameters": [
-          {
-            "name": "petId",
-            "in": "path",
-            "description": "ID of pet that needs to be updated",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "name",
-            "in": "query",
-            "description": "Name of pet that needs to be updated",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "status",
-            "in": "query",
-            "description": "Status of pet that needs to be updated",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Pet"
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/Pet"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "default": {
-            "description": "Unexpected error"
-          }
-        },
-        "security": [
-          {
-            "petstore_auth": ["write:pets", "read:pets"]
-          }
-        ]
-      },
-      "delete": {
-        "tags": ["pet"],
-        "summary": "Deletes a pet.",
-        "description": "Delete a pet.",
-        "operationId": "deletePet",
-        "parameters": [
-          {
-            "name": "api_key",
-            "in": "header",
-            "description": "",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "petId",
-            "in": "path",
-            "description": "Pet id to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Pet deleted"
-          },
-          "400": {
-            "description": "Invalid pet value"
-          },
-          "default": {
-            "description": "Unexpected error"
-          }
-        },
-        "security": [
-          {
-            "petstore_auth": ["write:pets", "read:pets"]
-          }
-        ]
-      }
-    },
-    "/pet/{petId}/uploadImage": {
-      "post": {
-        "tags": ["pet"],
-        "summary": "Uploads an image.",
-        "description": "Upload image of the pet.",
-        "operationId": "uploadFile",
-        "parameters": [
-          {
-            "name": "petId",
-            "in": "path",
-            "description": "ID of pet to update",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          },
-          {
-            "name": "additionalMetadata",
-            "in": "query",
-            "description": "Additional Metadata",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/octet-stream": {
-              "schema": {
-                "type": "string",
-                "format": "binary"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ApiResponse"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "No file uploaded"
-          },
-          "404": {
-            "description": "Pet not found"
-          },
-          "default": {
-            "description": "Unexpected error"
-          }
-        },
-        "security": [
-          {
-            "petstore_auth": ["write:pets", "read:pets"]
-          }
-        ]
-      }
-    },
-    "/store/inventory": {
-      "get": {
-        "tags": ["store"],
-        "summary": "Returns pet inventories by status.",
-        "description": "Returns a map of status codes to quantities.",
-        "operationId": "getInventory",
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "additionalProperties": {
-                    "type": "integer",
-                    "format": "int32"
-                  }
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Unexpected error"
-          }
-        },
-        "security": [
-          {
-            "api_key": []
-          }
-        ]
-      }
-    },
-    "/store/order": {
-      "post": {
-        "tags": ["store"],
-        "summary": "Place an order for a pet.",
-        "description": "Place a new order in the store.",
-        "operationId": "placeOrder",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/Order"
-              }
-            },
-            "application/xml": {
-              "schema": {
-                "$ref": "#/components/schemas/Order"
-              }
-            },
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "$ref": "#/components/schemas/Order"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Order"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "422": {
-            "description": "Validation exception"
-          },
-          "default": {
-            "description": "Unexpected error"
-          }
-        }
-      }
-    },
-    "/store/order/{orderId}": {
-      "get": {
-        "tags": ["store"],
-        "summary": "Find purchase order by ID.",
-        "description": "For valid response try integer IDs with value <= 5 or > 10. Other values will generate exceptions.",
-        "operationId": "getOrderById",
-        "parameters": [
-          {
-            "name": "orderId",
-            "in": "path",
-            "description": "ID of order that needs to be fetched",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Order"
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/Order"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "Order not found"
-          },
-          "default": {
-            "description": "Unexpected error"
-          }
-        }
-      },
-      "delete": {
-        "tags": ["store"],
-        "summary": "Delete purchase order by identifier.",
-        "description": "For valid response try integer IDs with value < 1000. Anything above 1000 or non-integers will generate API errors.",
-        "operationId": "deleteOrder",
-        "parameters": [
-          {
-            "name": "orderId",
-            "in": "path",
-            "description": "ID of the order that needs to be deleted",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "order deleted"
-          },
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "Order not found"
-          },
-          "default": {
-            "description": "Unexpected error"
-          }
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
         }
       }
     },
     "/user": {
       "post": {
-        "tags": ["user"],
-        "summary": "Create user.",
-        "description": "This can only be done by the logged in user.",
+        "tags": ["Users"],
+        "summary": "Criar usuario",
         "operationId": "createUser",
         "requestBody": {
-          "description": "Created user object",
+          "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/User"
-              }
-            },
-            "application/xml": {
-              "schema": {
-                "$ref": "#/components/schemas/User"
-              }
-            },
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "$ref": "#/components/schemas/User"
-              }
+              "schema": { "$ref": "#/components/schemas/UserCreate" }
             }
           }
         },
         "responses": {
-          "200": {
-            "description": "successful operation",
+          "201": {
+            "description": "Usuario criado",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
+                "schema": { "$ref": "#/components/schemas/UserWithToken" }
               }
             }
           },
-          "default": {
-            "description": "Unexpected error"
-          }
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
         }
       }
     },
-    "/user/createWithList": {
-      "post": {
-        "tags": ["user"],
-        "summary": "Creates list of users with given input array.",
-        "description": "Creates list of users with given input array.",
-        "operationId": "createUsersWithListInput",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "Unexpected error"
-          }
-        }
-      }
-    },
-    "/user/login": {
+    "/users": {
       "get": {
-        "tags": ["user"],
-        "summary": "Logs user into the system.",
-        "description": "Log into the system.",
-        "operationId": "loginUser",
+        "tags": ["Users"],
+        "summary": "Listar usuarios",
+        "operationId": "listUsers",
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
-            "name": "username",
+            "name": "page",
             "in": "query",
-            "description": "The user name for login",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
+            "schema": { "type": "integer", "minimum": 1, "default": 1 }
           },
           {
-            "name": "password",
+            "name": "role",
             "in": "query",
-            "description": "The password for login in clear text",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
+            "schema": { "$ref": "#/components/schemas/Role" }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": { "$ref": "#/components/schemas/UserStatus" }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": { "type": "string" }
           }
         ],
         "responses": {
           "200": {
-            "description": "successful operation",
-            "headers": {
-              "X-Rate-Limit": {
-                "description": "calls per hour allowed by the user",
-                "schema": {
-                  "type": "integer",
-                  "format": "int32"
-                }
-              },
-              "X-Expires-After": {
-                "description": "date in UTC when token expires",
-                "schema": {
-                  "type": "string",
-                  "format": "date-time"
-                }
-              }
-            },
+            "description": "Lista de usuarios",
             "content": {
-              "application/xml": {
-                "schema": {
-                  "type": "string"
-                }
-              },
               "application/json": {
                 "schema": {
-                  "type": "string"
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/User" }
+                    },
+                    "meta": { "$ref": "#/components/schemas/PaginationMeta" }
+                  }
                 }
               }
             }
           },
-          "400": {
-            "description": "Invalid username/password supplied"
-          },
-          "default": {
-            "description": "Unexpected error"
-          }
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
         }
       }
     },
-    "/user/logout": {
+    "/user/{id}": {
       "get": {
-        "tags": ["user"],
-        "summary": "Logs out current logged in user session.",
-        "description": "Log user out of the system.",
-        "operationId": "logoutUser",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "successful operation"
-          },
-          "default": {
-            "description": "Unexpected error"
-          }
-        }
-      }
-    },
-    "/user/{username}": {
-      "get": {
-        "tags": ["user"],
-        "summary": "Get user by user name.",
-        "description": "Get user detail based on username.",
-        "operationId": "getUserByName",
+        "tags": ["Users"],
+        "summary": "Buscar usuario por id",
+        "operationId": "getUserById",
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
-            "name": "username",
+            "name": "id",
             "in": "path",
-            "description": "The name that needs to be fetched. Use user1 for testing",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "schema": { "type": "integer", "minimum": 1 }
           }
         ],
         "responses": {
           "200": {
-            "description": "successful operation",
+            "description": "Usuario encontrado",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              },
-              "application/xml": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
+                "schema": { "$ref": "#/components/schemas/User" }
               }
             }
           },
-          "400": {
-            "description": "Invalid username supplied"
-          },
-          "404": {
-            "description": "User not found"
-          },
-          "default": {
-            "description": "Unexpected error"
-          }
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
         }
       },
-      "put": {
-        "tags": ["user"],
-        "summary": "Update user resource.",
-        "description": "This can only be done by the logged in user.",
-        "operationId": "updateUser",
+      "patch": {
+        "tags": ["Users"],
+        "summary": "Atualizar usuario",
+        "operationId": "patchUser",
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
-            "name": "username",
+            "name": "id",
             "in": "path",
-            "description": "name that need to be deleted",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "schema": { "type": "integer", "minimum": 1 }
           }
         ],
         "requestBody": {
-          "description": "Update an existent user in the store",
+          "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/User"
-              }
-            },
-            "application/xml": {
-              "schema": {
-                "$ref": "#/components/schemas/User"
-              }
-            },
-            "application/x-www-form-urlencoded": {
-              "schema": {
-                "$ref": "#/components/schemas/User"
-              }
+              "schema": { "$ref": "#/components/schemas/UserPatch" }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "successful operation"
+            "description": "Usuario atualizado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" }
+              }
+            }
           },
-          "400": {
-            "description": "bad request"
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/statuses": {
+      "get": {
+        "tags": ["Statuses"],
+        "summary": "Listar status",
+        "operationId": "listStatuses",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "minimum": 1, "default": 1 }
           },
-          "404": {
-            "description": "user not found"
-          },
-          "default": {
-            "description": "Unexpected error"
+          {
+            "name": "name",
+            "in": "query",
+            "schema": { "type": "string" }
           }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Status" }
+                    },
+                    "meta": { "$ref": "#/components/schemas/PaginationMeta" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/status": {
+      "post": {
+        "tags": ["Statuses"],
+        "summary": "Criar status",
+        "operationId": "createStatus",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/StatusCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Status criado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Status" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/status/{id}": {
+      "get": {
+        "tags": ["Statuses"],
+        "summary": "Buscar status por id",
+        "operationId": "getStatusById",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "minimum": 1 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Status encontrado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Status" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      },
+      "patch": {
+        "tags": ["Statuses"],
+        "summary": "Atualizar status",
+        "operationId": "patchStatus",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "minimum": 1 }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/StatusPatch" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Status atualizado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Status" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
         }
       },
       "delete": {
-        "tags": ["user"],
-        "summary": "Delete user resource.",
-        "description": "This can only be done by the logged in user.",
-        "operationId": "deleteUser",
+        "tags": ["Statuses"],
+        "summary": "Excluir status",
+        "operationId": "deleteStatus",
+        "security": [{ "bearerAuth": [] }],
         "parameters": [
           {
-            "name": "username",
+            "name": "id",
             "in": "path",
-            "description": "The name that needs to be deleted",
             "required": true,
-            "schema": {
-              "type": "string"
-            }
+            "schema": { "type": "integer", "minimum": 1 }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Status excluido" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/categories": {
+      "get": {
+        "tags": ["Categories"],
+        "summary": "Listar categorias",
+        "operationId": "listCategories",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "minimum": 1, "default": 1 }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": { "type": "string" }
           }
         ],
         "responses": {
           "200": {
-            "description": "User deleted"
+            "description": "Lista de categorias",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Category" }
+                    },
+                    "meta": { "$ref": "#/components/schemas/PaginationMeta" }
+                  }
+                }
+              }
+            }
           },
-          "400": {
-            "description": "Invalid username supplied"
-          },
-          "404": {
-            "description": "User not found"
-          },
-          "default": {
-            "description": "Unexpected error"
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/category": {
+      "post": {
+        "tags": ["Categories"],
+        "summary": "Criar categoria",
+        "operationId": "createCategory",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CategoryCreate" }
+            }
           }
+        },
+        "responses": {
+          "201": {
+            "description": "Categoria criada",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Category" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/category/{id}": {
+      "get": {
+        "tags": ["Categories"],
+        "summary": "Buscar categoria por id",
+        "operationId": "getCategoryById",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "minimum": 1 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Categoria encontrada",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Category" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      },
+      "patch": {
+        "tags": ["Categories"],
+        "summary": "Atualizar categoria",
+        "operationId": "patchCategory",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "minimum": 1 }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CategoryPatch" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Categoria atualizada",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Category" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      },
+      "delete": {
+        "tags": ["Categories"],
+        "summary": "Excluir categoria",
+        "operationId": "deleteCategory",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "minimum": 1 }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Categoria excluida" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/buildings": {
+      "get": {
+        "tags": ["Buildings"],
+        "summary": "Listar edificios",
+        "operationId": "listBuildings",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "minimum": 1, "default": 1 }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de edificios",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Building" }
+                    },
+                    "meta": { "$ref": "#/components/schemas/PaginationMeta" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/building": {
+      "post": {
+        "tags": ["Buildings"],
+        "summary": "Criar edificio",
+        "operationId": "createBuilding",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/BuildingCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Edificio criado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Building" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/building/{id}": {
+      "get": {
+        "tags": ["Buildings"],
+        "summary": "Buscar edificio por id",
+        "operationId": "getBuildingById",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "minimum": 1 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Edificio encontrado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Building" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      },
+      "patch": {
+        "tags": ["Buildings"],
+        "summary": "Atualizar edificio",
+        "operationId": "patchBuilding",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "minimum": 1 }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/BuildingPatch" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Edificio atualizado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Building" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      },
+      "delete": {
+        "tags": ["Buildings"],
+        "summary": "Excluir edificio",
+        "operationId": "deleteBuilding",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "minimum": 1 }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Edificio excluido" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/incidents": {
+      "get": {
+        "tags": ["Incidents"],
+        "summary": "Listar incidentes",
+        "operationId": "listIncidents",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "minimum": 1 }
+          },
+          {
+            "name": "priority",
+            "in": "query",
+            "schema": { "$ref": "#/components/schemas/Priority" }
+          },
+          {
+            "name": "statusId",
+            "in": "query",
+            "schema": { "type": "integer", "minimum": 1 }
+          },
+          {
+            "name": "categoryId",
+            "in": "query",
+            "schema": { "type": "integer", "minimum": 1 }
+          },
+          {
+            "name": "query",
+            "in": "query",
+            "schema": { "type": "string", "minLength": 3, "maxLength": 255 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de incidentes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/IncidentSummary"
+                      }
+                    },
+                    "meta": { "$ref": "#/components/schemas/PaginationMeta" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/incident": {
+      "post": {
+        "tags": ["Incidents"],
+        "summary": "Criar incidente",
+        "operationId": "createIncident",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": { "$ref": "#/components/schemas/IncidentCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Incidente criado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/IncidentCreated" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "422": { "$ref": "#/components/responses/UnprocessableEntity" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/incident/{id}": {
+      "get": {
+        "tags": ["Incidents"],
+        "summary": "Buscar incidente por id",
+        "operationId": "getIncidentById",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "minimum": 1 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Incidente encontrado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/IncidentDetailed" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      },
+      "patch": {
+        "tags": ["Incidents"],
+        "summary": "Atualizar incidente",
+        "operationId": "patchIncident",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "minimum": 1 }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/IncidentPatch" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Incidente atualizado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Incident" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      },
+      "delete": {
+        "tags": ["Incidents"],
+        "summary": "Excluir incidente",
+        "operationId": "deleteIncident",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "minimum": 1 }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Incidente excluido" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/incident/{id}/picture/{pictureId}": {
+      "get": {
+        "tags": ["Incidents"],
+        "summary": "Buscar foto do incidente",
+        "operationId": "getIncidentPicture",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "minimum": 1 }
+          },
+          {
+            "name": "pictureId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "minimum": 1, "maximum": 5 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Arquivo da foto",
+            "content": {
+              "application/octet-stream": {
+                "schema": { "type": "string", "format": "binary" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/comments": {
+      "get": {
+        "tags": ["Comments"],
+        "summary": "Listar comentarios",
+        "operationId": "listComments",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "incidentId",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "integer", "minimum": 1 }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "schema": { "type": "integer", "minimum": 1, "default": 1 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Lista de comentarios",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/CommentWithUser"
+                      }
+                    },
+                    "meta": { "$ref": "#/components/schemas/PaginationMeta" }
+                  }
+                }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/comment": {
+      "post": {
+        "tags": ["Comments"],
+        "summary": "Criar comentario",
+        "operationId": "createComment",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CommentCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Comentario criado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Comment" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      }
+    },
+    "/comment/{id}": {
+      "get": {
+        "tags": ["Comments"],
+        "summary": "Buscar comentario por id",
+        "operationId": "getCommentById",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "minimum": 1 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Comentario encontrado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CommentWithUser" }
+              }
+            }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
+        }
+      },
+      "delete": {
+        "tags": ["Comments"],
+        "summary": "Excluir comentario",
+        "operationId": "deleteComment",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "minimum": 1 }
+          }
+        ],
+        "responses": {
+          "204": { "description": "Comentario excluido" },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "500": { "$ref": "#/components/responses/InternalServerError" }
         }
       }
     }
   },
   "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    },
     "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": { "type": "string" },
+          "details": {
+            "type": "object",
+            "description": "Opcional",
+            "additionalProperties": { "type": "string" }
+          }
+        }
+      },
+      "Role": {
+        "type": "string",
+        "enum": ["admin", "student", "employee"]
+      },
+      "UserStatus": {
+        "type": "string",
+        "enum": ["pending", "rejected", "active", "inactive"]
+      },
+      "Priority": {
+        "type": "string",
+        "enum": ["low", "medium", "high"]
+      },
+      "PaginationMeta": {
+        "type": "object",
+        "properties": {
+          "total": { "type": "integer", "minimum": 0 },
+          "page": { "type": "integer", "minimum": 1 },
+          "lastPage": { "type": "integer", "minimum": 1 }
+        }
+      },
       "User": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "example": 10
-          },
-          "name": {
-            "type": "string",
-            "example": "User Name"
-          },
-          "email": {
-            "type": "string",
-            "example": "user@email.com"
-          },
-          "role": {
-            "type": "string",
-            "enum": ["admin", "student", "employee"]
-          },
-          "password": {
-            "type": "string",
-            "example": "12345678"
-          },
-          "status": {
-            "type": "string",
-            "enum": ["pending", "rejected", "active", "inactive"]
+          "id": { "type": "integer" },
+          "email": { "type": "string", "format": "email" },
+          "name": { "type": "string" },
+          "status": { "$ref": "#/components/schemas/UserStatus" },
+          "role": { "$ref": "#/components/schemas/Role" }
+        }
+      },
+      "UserWithToken": {
+        "allOf": [
+          { "$ref": "#/components/schemas/User" },
+          {
+            "type": "object",
+            "properties": {
+              "token": { "type": "string" }
+            }
           }
+        ]
+      },
+      "UserCreate": {
+        "type": "object",
+        "required": ["email", "name", "password"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "name": { "type": "string", "minLength": 3 },
+          "password": { "type": "string", "minLength": 8 }
+        }
+      },
+      "UserLogin": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "minLength": 8 }
+        }
+      },
+      "UserPatch": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "minLength": 3 },
+          "password": { "type": "string", "minLength": 8 },
+          "status": { "$ref": "#/components/schemas/UserStatus" },
+          "role": { "$ref": "#/components/schemas/Role" }
         }
       },
       "Status": {
-        "type": "string",
+        "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "example": 1
-          },
-          "name": {
-            "type": "string",
-            "example": "Pendente"
-          },
-          "description": {
-            "type": "string",
-            "example": "O incidente está pendente"
-          },
-          "color": {
-            "type": "string",
-            "example": "#FF0000"
-          }
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "color": { "type": "string", "pattern": "^[0-9A-Fa-f]{6}$" }
+        }
+      },
+      "StatusCreate": {
+        "type": "object",
+        "required": ["name", "description", "color"],
+        "properties": {
+          "name": { "type": "string", "minLength": 3, "maxLength": 32 },
+          "description": { "type": "string", "minLength": 8, "maxLength": 255 },
+          "color": { "type": "string", "pattern": "^[0-9A-Fa-f]{6}$" }
+        }
+      },
+      "StatusPatch": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "minLength": 3, "maxLength": 32 },
+          "description": { "type": "string", "minLength": 8, "maxLength": 255 },
+          "color": { "type": "string", "pattern": "^[0-9A-Fa-f]{6}$" }
         }
       },
       "Category": {
-        "type": "string",
-        "properties": {
-          "id": {
-            "type": "integer",
-            "example": 1
-          },
-          "name": {
-            "type": "string",
-            "example": "Pendente"
-          },
-          "description": {
-            "type": "string",
-            "example": "O incidente está pendente"
-          },
-          "color": {
-            "type": "string",
-            "example": "#FF0000"
-          }
-        }
-      },
-      "Incident": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "example": 1
-          },
-          "userId": {
-            "type": "integer",
-            "example": 1
-          },
-          "shortDescription": {
-            "type": "string",
-            "example": "Buracos no chão"
-          },
-          "description": {
-            "type": "string",
-            "example": "Buracos no chão da rua estão causando acidentes"
-          },
-          "buildingId": {
-            "type": "integer",
-            "example": 1
-          },
-          "location": {
-            "type": "string",
-            "example": "Rua 1, nº 100"
-          },
-          "priority": {
-            "type": "string",
-            "description": "Opcional",
-            "enum": ["low", "medium", "high"]
-          },
-          "statusId": {
-            "type": "integer",
-            "example": 1
-          },
-          "categoryId": {
-            "type": "integer",
-            "example": 1
-          },
-          "pictures": {
-            "type": "array",
-            "description": "Opcional",
-            "items": {
-              "$ref": "#/components/schemas/IncidentPicture"
-            }
-          }
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "color": { "type": "string", "pattern": "^[0-9A-Fa-f]{6}$" }
         }
       },
-      "IncidentPicture": {
+      "CategoryCreate": {
         "type": "object",
+        "required": ["name", "description", "color"],
         "properties": {
-          "id": {
-            "type": "integer",
-            "example": 1
-          },
-          "incidentId": {
-            "type": "integer",
-            "example": 1
-          },
-          "title": {
-            "type": "string",
-            "example": "Foto do buraco"
-          },
-          "description": {
-            "type": "string",
-            "description": "Opcional",
-            "example": "Foto do buraco na rua 1, nº 100"
-          },
-          "pictureUrl": {
-            "type": "string",
-            "example": "https://example.com/picture.jpg"
-          }
+          "name": { "type": "string", "minLength": 3, "maxLength": 32 },
+          "description": { "type": "string", "minLength": 8, "maxLength": 255 },
+          "color": { "type": "string", "pattern": "^[0-9A-Fa-f]{6}$" }
         }
       },
-      "Comment": {
+      "CategoryPatch": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "example": 1
-          },
-          "incidentId": {
-            "type": "integer",
-            "example": 1
-          },
-          "userId": {
-            "type": "integer",
-            "example": 1
-          },
-          "comment": {
-            "type": "string",
-            "example": "Esse buraco está causando muitos acidentes, por favor resolvam isso o mais rápido possível!"
-          },
-          "status": {
-            "type": "string",
-            "description": "Opcional",
-            "enum": ["active", "inactive", "rejected", "pending"]
-          }
+          "name": { "type": "string", "minLength": 3, "maxLength": 32 },
+          "description": { "type": "string", "minLength": 8, "maxLength": 255 },
+          "color": { "type": "string", "pattern": "^[0-9A-Fa-f]{6}$" }
         }
       },
       "Building": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "integer",
-            "example": 1
-          },
-          "name": {
-            "type": "string",
-            "example": "Prédio A"
-          },
-          "description": {
-            "type": "string",
-            "example": "Rua 1, nº 100"
-          },
-          "status": {
-            "type": "string",
-            "enum": ["active", "inactive", "rejected", "pending"]
-          },
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "status": { "$ref": "#/components/schemas/UserStatus" },
           "area": {
             "type": "object",
             "properties": {
-              "type": {
-                "type": "string",
-                "example": "Polygon"
-              },
+              "type": { "type": "string", "example": "Polygon" },
               "coordinates": {
                 "type": "array",
                 "items": {
                   "type": "array",
                   "items": {
                     "type": "array",
-                    "items": {
-                      "type": "number"
-                    }
+                    "items": { "type": "number" }
                   }
                 }
               }
             }
           }
         }
-      }
-    },
-    "requestBodies": {
-      "Pet": {
-        "description": "Pet object that needs to be added to the store",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Pet"
+      },
+      "BuildingCreate": {
+        "type": "object",
+        "required": ["name", "description", "area"],
+        "properties": {
+          "name": { "type": "string", "minLength": 3 },
+          "description": { "type": "string", "minLength": 5 },
+          "area": {
+            "type": "string",
+            "description": "WKT Polygon, ex: POLYGON ((x y, x y, ...))"
+          }
+        }
+      },
+      "BuildingPatch": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "minLength": 3 },
+          "description": { "type": "string", "minLength": 5 },
+          "area": {
+            "type": "string",
+            "description": "WKT Polygon, ex: POLYGON ((x y, x y, ...))"
+          },
+          "status": { "$ref": "#/components/schemas/UserStatus" }
+        }
+      },
+      "IncidentPicture": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "incidentId": { "type": "integer" },
+          "pictureUrl": { "type": "string" },
+          "title": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      },
+      "Incident": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "userId": { "type": "integer" },
+          "shortDescription": { "type": "string" },
+          "description": { "type": "string" },
+          "buildingId": { "type": "integer" },
+          "location": { "type": "string" },
+          "priority": { "$ref": "#/components/schemas/Priority" },
+          "statusId": { "type": "integer" },
+          "categoryId": { "type": "integer" }
+        }
+      },
+      "IncidentSummary": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Incident" },
+          {
+            "type": "object",
+            "properties": {
+              "building": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "integer" },
+                  "name": { "type": "string" }
+                }
+              },
+              "category": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "integer" },
+                  "name": { "type": "string" },
+                  "color": { "type": "string" }
+                }
+              },
+              "status": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "integer" },
+                  "name": { "type": "string" },
+                  "color": { "type": "string" }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "IncidentDetailed": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Incident" },
+          {
+            "type": "object",
+            "properties": {
+              "pictures": {
+                "type": "array",
+                "items": { "$ref": "#/components/schemas/IncidentPicture" }
+              },
+              "building": { "$ref": "#/components/schemas/Building" },
+              "category": { "$ref": "#/components/schemas/Category" },
+              "status": { "$ref": "#/components/schemas/Status" }
+            }
+          }
+        ]
+      },
+      "IncidentCreated": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "shortDescription": { "type": "string" },
+          "description": { "type": "string" },
+          "location": { "type": "string" },
+          "buildingId": { "type": "integer" },
+          "categoryId": { "type": "integer" },
+          "pictures": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/IncidentPicture" }
+          },
+          "building": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "integer" },
+              "name": { "type": "string" }
             }
           },
-          "application/xml": {
-            "schema": {
-              "$ref": "#/components/schemas/Pet"
+          "category": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "integer" },
+              "name": { "type": "string" }
             }
           }
         }
       },
-      "UserArray": {
-        "description": "List of user object",
-        "content": {
-          "application/json": {
-            "schema": {
-              "type": "array",
-              "items": {
-                "$ref": "#/components/schemas/User"
+      "IncidentCreate": {
+        "type": "object",
+        "required": [
+          "shortDescription",
+          "description",
+          "buildingId",
+          "location",
+          "categoryId",
+          "picturesData",
+          "pictures"
+        ],
+        "properties": {
+          "shortDescription": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 255
+          },
+          "description": { "type": "string" },
+          "buildingId": { "type": "integer", "minimum": 1 },
+          "location": { "type": "string", "minLength": 5, "maxLength": 255 },
+          "categoryId": { "type": "integer", "minimum": 1 },
+          "picturesData": {
+            "type": "string",
+            "description": "JSON string de [{title, description?}]"
+          },
+          "pictures": {
+            "type": "array",
+            "items": { "type": "string", "format": "binary" },
+            "minItems": 1,
+            "maxItems": 5
+          }
+        }
+      },
+      "IncidentPatch": {
+        "type": "object",
+        "properties": {
+          "shortDescription": {
+            "type": "string",
+            "minLength": 5,
+            "maxLength": 255
+          },
+          "description": { "type": "string" },
+          "location": { "type": "string", "minLength": 5, "maxLength": 255 },
+          "priority": { "$ref": "#/components/schemas/Priority" },
+          "statusId": { "type": "integer", "minimum": 1 },
+          "categoryId": { "type": "integer", "minimum": 1 },
+          "buildingId": { "type": "integer", "minimum": 1 }
+        }
+      },
+      "Comment": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "incidentId": { "type": "integer" },
+          "userId": { "type": "integer" },
+          "comment": { "type": "string" },
+          "status": { "$ref": "#/components/schemas/UserStatus" }
+        }
+      },
+      "CommentWithUser": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Comment" },
+          {
+            "type": "object",
+            "properties": {
+              "user": {
+                "type": "object",
+                "properties": {
+                  "id": { "type": "integer" },
+                  "name": { "type": "string" },
+                  "role": { "$ref": "#/components/schemas/Role" }
+                }
               }
             }
+          }
+        ]
+      },
+      "CommentCreate": {
+        "type": "object",
+        "required": ["incidentId", "comment"],
+        "properties": {
+          "incidentId": { "type": "integer", "minimum": 1 },
+          "comment": { "type": "string", "minLength": 1, "maxLength": 255 }
+        }
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Requisicao invalida",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Nao autenticado",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Acesso negado",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Nao encontrado",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "UnprocessableEntity": {
+        "description": "Erro de processamento",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "Erro interno do servidor",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorResponse" }
           }
         }
       }
