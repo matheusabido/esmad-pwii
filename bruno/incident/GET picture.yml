@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:3000/incident/1/picture/1
+  url: http://localhost:3000/incident/2/picture/2
   auth: inherit
 
 settings:

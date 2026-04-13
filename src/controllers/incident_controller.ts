@@ -23,6 +23,7 @@ import { AVAILABLE_PRIORITIES } from "@/enum/priority.js";
 import Status from "@/models/status.js";
 import { Op } from "sequelize";
 import { paginate } from "@/utils/paginate.js";
+import sharp from "sharp";
 
 const storeValidator = z.object({
   shortDescription: z
@@ -294,10 +295,11 @@ export default class IncidentController implements Controller {
     const picturesUrl: string[] = [];
     for (const file of files) {
       const fileContent = await readFile(file.path);
+      const compressed = await sharp(fileContent).jpeg().toBuffer();
       const uploadParams = {
         Bucket: process.env.S3_BUCKET_NAME!,
         Key: `incidents/${Date.now()}_${file.filename}`,
-        Body: fileContent,
+        Body: compressed,
         ContentType: file.mimetype,
       } satisfies PutObjectCommandInput;
 
