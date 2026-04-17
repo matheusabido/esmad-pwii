@@ -16,19 +16,25 @@ const storeValidator = z.object({
   name: z
     .string("Nome deve ser uma string")
     .trim()
-    .min(3, "O nome deve conter no mínimo 3 caracteres"),
+    .min(3, "O nome deve conter no mínimo 3 caracteres")
+    .max(255, "O nome deve conter no máximo 255 caracteres"),
   password: z
     .string("A senha deve ser uma string")
     .trim()
-    .min(8, "A senha deve conter no mínimo 8 caracteres"),
+    .min(8, "A senha deve conter no mínimo 8 caracteres")
+    .max(48, "A senha deve conter no máximo 48 caracteres"),
 });
 
 const loginValidator = z.object({
-  email: z.email("E-mail inválido").trim(),
+  email: z
+    .email("E-mail inválido")
+    .max(255, "E-mail deve ter no máximo 255 caracteres")
+    .trim(),
   password: z
     .string("A senha deve ser uma string")
     .trim()
-    .min(8, "A senha deve conter no mínimo 8 caracteres"),
+    .min(8, "A senha deve conter no mínimo 8 caracteres")
+    .max(48, "A senha deve conter no máximo 48 caracteres"),
 });
 
 const findValidator = z.object({
@@ -47,11 +53,13 @@ const patchValidator = z.object({
     .string("Nome deve ser uma string")
     .trim()
     .min(3, "O nome deve conter no mínimo 3 caracteres")
+    .max(255, "O nome deve conter no máximo 255 caracteres")
     .optional(),
   password: z
     .string("A senha deve ser uma string")
     .trim()
     .min(8, "A senha deve conter no mínimo 8 caracteres")
+    .max(48, "A senha deve conter no máximo 48 caracteres")
     .optional(),
   status: z.enum(AVAILABLE_STATUSES).optional(),
   role: z.enum(AVAILABLE_ROLES).optional(),

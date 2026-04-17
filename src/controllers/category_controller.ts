@@ -8,7 +8,11 @@ import { paginate } from "@/utils/paginate.js";
 import { AppError } from "@/utils/errors.js";
 
 const listValidator = z.object({
-  name: z.string("O nome deve ser um texto").trim().optional(),
+  name: z
+    .string("O nome deve ser um texto")
+    .trim()
+    .max(255, "Nome deve ter no máximo 255 caracteres")
+    .optional(),
   page: z.coerce
     .number("A página deve ser um número")
     .int("A página deve ser um número inteiro")

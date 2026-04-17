@@ -14,11 +14,13 @@ const storeValidator = z.object({
   name: z
     .string("Nome deve ser um texto")
     .trim()
-    .min(3, "Nome deve ter pelo menos 3 caracteres"),
+    .min(3, "Nome deve ter pelo menos 3 caracteres")
+    .max(255, "Nome deve ter no máximo 255 caracteres"),
   description: z
     .string("Descrição deve ser um texto")
     .trim()
-    .min(5, "Descrição deve ter pelo menos 5 caracteres"),
+    .min(5, "Descrição deve ter pelo menos 5 caracteres")
+    .max(255, "Descrição deve ter no máximo 255 caracteres"),
   area: z
     .string("Área deve ser um texto")
     .trim()
@@ -33,11 +35,13 @@ const patchValidator = z.object({
     .string("Nome deve ser um texto")
     .trim()
     .min(3, "Nome deve ter pelo menos 3 caracteres")
+    .max(255, "Nome deve ter no máximo 255 caracteres")
     .optional(),
   description: z
     .string("Descrição deve ser um texto")
     .trim()
     .min(5, "Descrição deve ter pelo menos 5 caracteres")
+    .max(255, "Descrição deve ter no máximo 255 caracteres")
     .optional(),
   area: z
     .string("Área deve ser um texto")
@@ -60,7 +64,11 @@ const findValidator = z.object({
 });
 
 const listValidator = z.object({
-  name: z.string("O nome deve ser um texto").trim().optional(),
+  name: z
+    .string("O nome deve ser um texto")
+    .trim()
+    .max(255, "Nome deve ter no máximo 255 caracteres")
+    .optional(),
   page: z.coerce
     .number("A página deve ser um número")
     .int("A página deve ser um número inteiro")
