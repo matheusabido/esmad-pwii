@@ -102,9 +102,7 @@ MinIO é compatível com SDK do S3, se decidir trocar para AWS é só trocar as 
 
 ### Documentação
 
-Ainda não fiz o Swagger :)
-
-Mas vai sair. É um requisito hahahah
+[Acessar o Swagger](https://matheusabido.github.io/esmad-pwii/swagger.html)
 
 ### Testar
 
